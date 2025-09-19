@@ -17,7 +17,7 @@ export default function SignupScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signupLogin } = useAuth();
+  const { login } = useAuth();
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -57,8 +57,8 @@ export default function SignupScreen({ navigation }) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // In a real app, you would handle registration here
-      // Automatically log the user in and navigate to user info collection (onboarding)
-      signupLogin(); // This will trigger navigation to UserInfoStack
+      // Automatically log the user in and navigate to user info collection
+      login(); // This will trigger navigation to UserInfoStack
     } catch (error) {
       Alert.alert('Error', 'Registration failed. Please try again.');
     } finally {

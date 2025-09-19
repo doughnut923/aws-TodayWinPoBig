@@ -52,9 +52,8 @@ export default function UserInfoAgeScreen({ navigation, route }) {
             <View style={[styles.progressStep, styles.progressStepActive]} />
             <View style={styles.progressStep} />
             <View style={styles.progressStep} />
-            <View style={styles.progressStep} />
           </View>
-          <Text style={styles.stepText}>Step 2 of 5</Text>
+          <Text style={styles.stepText}>Step 2 of 4</Text>
         </View>
 
         <View style={styles.content}>

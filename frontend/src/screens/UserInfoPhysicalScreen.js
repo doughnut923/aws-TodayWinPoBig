@@ -62,7 +62,7 @@ export default function UserInfoPhysicalScreen({ navigation, route }) {
       }
     }
 
-    navigation.navigate('UserInfoLocation', {
+    navigation.navigate('UserInfoGoals', {
       userData: {
         ...userData,
         weight: weightNumber,
@@ -88,9 +88,8 @@ export default function UserInfoPhysicalScreen({ navigation, route }) {
             <View style={[styles.progressStep, styles.progressStepActive]} />
             <View style={[styles.progressStep, styles.progressStepActive]} />
             <View style={styles.progressStep} />
-            <View style={styles.progressStep} />
           </View>
-          <Text style={styles.stepText}>Step 3 of 5</Text>
+          <Text style={styles.stepText}>Step 3 of 4</Text>
         </View>
 
         <View style={styles.content}>

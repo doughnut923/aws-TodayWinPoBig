@@ -55,7 +55,7 @@ export default function UserInfoGoalsScreen({ navigation, route }) {
       console.log('User Data:', completeUserData);
       
       // Complete the onboarding process
-      completeOnboarding(completeUserData); // This will navigate to the main app
+      completeOnboarding(); // This will navigate to the main app
     } catch (error) {
       Alert.alert('Error', 'Failed to save your information. Please try again.');
     }
@@ -73,9 +73,8 @@ export default function UserInfoGoalsScreen({ navigation, route }) {
           <View style={[styles.progressStep, styles.progressStepActive]} />
           <View style={[styles.progressStep, styles.progressStepActive]} />
           <View style={[styles.progressStep, styles.progressStepActive]} />
-          <View style={[styles.progressStep, styles.progressStepActive]} />
         </View>
-        <Text style={styles.stepText}>Step 5 of 5</Text>
+        <Text style={styles.stepText}>Step 4 of 4</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
