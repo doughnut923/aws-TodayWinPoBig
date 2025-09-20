@@ -9,10 +9,21 @@ import {
   Image,
   Alert,
 } from 'react-native';
+import { MealInfoScreenProps } from '../types';
+
+interface NutritionalTag {
+  name: string;
+  color: string;
+}
+
+interface MealDetails {
+  ingredients: string[];
+  nutritionalTags: NutritionalTag[];
+}
 
 // Extended meal data with nutrition info
-const getMealDetails = (mealId) => {
-  const mealDetails = {
+const getMealDetails = (mealId: number): MealDetails => {
+  const mealDetails: Record<number, MealDetails> = {
     1: {
       ingredients: ['Whole grain bread', 'Avocado', 'Cherry tomatoes', 'Feta cheese', 'Olive oil', 'Lemon juice', 'Red pepper flakes'],
       nutritionalTags: [
@@ -51,31 +62,33 @@ const getMealDetails = (mealId) => {
   };
 };
 
-export default function MealInfoScreen({ navigation, route }) {
+const MealInfoScreen: React.FC<MealInfoScreenProps> = ({ navigation, route }) => {
   const { meal } = route.params;
   const mealDetails = getMealDetails(meal.id);
 
-  const handleOrder = () => {
+  const handleOrder = (): void => {
     Alert.alert(
-      'Order Meal',
-      `Would you like to order ${meal.name} from ${meal.restaurant}?`,
+      'Order Placed!',
+      `Your order for ${meal.name} has been placed successfully!`,
       [
         {
-          text: 'Cancel',
-          style: 'cancel',
+          text: 'View Orders',
+          onPress: () => {
+            // In a real app, navigate to orders screen
+            Alert.alert('Coming Soon', 'Orders screen will be available soon!');
+          },
         },
         {
-          text: 'Order Now',
-          onPress: () => {
-            Alert.alert('Order Placed!', 'Your order has been placed successfully. Estimated delivery: 30-45 minutes.');
-          },
+          text: 'Continue Shopping',
+          onPress: () => navigation.goBack(),
+          style: 'cancel',
         },
       ]
     );
   };
 
-  const handleBack = () => {
-    navigation.goBack();
+  const handleAddToCart = (): void => {
+    Alert.alert('Added to Cart', `${meal.name} has been added to your cart!`);
   };
 
   return (
@@ -83,19 +96,31 @@ export default function MealInfoScreen({ navigation, route }) {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header Image */}
         <View style={styles.imageContainer}>
-          <Image source={{ uri: meal.image }} style={styles.mealImage} />
-          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+          <Image source={{ uri: meal.image }} style={styles.image} />
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
         </View>
 
         {/* Meal Info */}
         <View style={styles.content}>
-          <View style={styles.mealHeader}>
-            <Text style={styles.mealName}>{meal.name}</Text>
+          <View style={styles.header}>
+            {meal.type && (
+              <Text style={styles.type}>{meal.type}</Text>
+            )}
+            <Text style={styles.name}>{meal.name}</Text>
             <Text style={styles.restaurant}>{meal.restaurant}</Text>
-            <View style={styles.calorieContainer}>
-              <Text style={styles.calories}>{meal.calories} calories</Text>
+            
+            <View style={styles.priceCalorieRow}>
+              <View style={styles.calorieContainer}>
+                <Text style={styles.calories}>{meal.calories} cal</Text>
+              </View>
+              {meal.price && (
+                <Text style={styles.price}>${meal.price}</Text>
+              )}
             </View>
           </View>
 
@@ -120,51 +145,43 @@ export default function MealInfoScreen({ navigation, route }) {
             <View style={styles.ingredientsContainer}>
               {mealDetails.ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.ingredientItem}>
-                  <Text style={styles.ingredientBullet}>•</Text>
+                  <Text style={styles.bullet}>•</Text>
                   <Text style={styles.ingredientText}>{ingredient}</Text>
                 </View>
               ))}
             </View>
           </View>
 
-          {/* Nutrition Facts */}
+          {/* Description */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Nutrition Facts</Text>
-            <View style={styles.nutritionCard}>
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Calories</Text>
-                <Text style={styles.nutritionValue}>{meal.calories}</Text>
-              </View>
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Protein</Text>
-                <Text style={styles.nutritionValue}>25g</Text>
-              </View>
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Carbohydrates</Text>
-                <Text style={styles.nutritionValue}>35g</Text>
-              </View>
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Fat</Text>
-                <Text style={styles.nutritionValue}>18g</Text>
-              </View>
-              <View style={styles.nutritionRow}>
-                <Text style={styles.nutritionLabel}>Fiber</Text>
-                <Text style={styles.nutritionValue}>8g</Text>
-              </View>
-            </View>
+            <Text style={styles.sectionTitle}>Description</Text>
+            <Text style={styles.description}>
+              A carefully crafted {meal.name.toLowerCase()} featuring fresh, high-quality ingredients. 
+              Perfect for maintaining your nutritional goals while enjoying delicious flavors.
+            </Text>
           </View>
         </View>
       </ScrollView>
 
-      {/* Order Button */}
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.orderButton} onPress={handleOrder}>
-          <Text style={styles.orderButtonText}>Order Now - $12.99</Text>
+      {/* Action Buttons */}
+      <View style={styles.actionContainer}>
+        <TouchableOpacity
+          style={styles.addToCartButton}
+          onPress={handleAddToCart}
+        >
+          <Text style={styles.addToCartText}>Add to Cart</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.orderButton}
+          onPress={handleOrder}
+        >
+          <Text style={styles.orderButtonText}>Order Now</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -178,41 +195,41 @@ const styles = StyleSheet.create({
     position: 'relative',
     height: 250,
   },
-  mealImage: {
+  image: {
     width: '100%',
     height: '100%',
   },
   backButton: {
     position: 'absolute',
-    top: 16,
-    left: 16,
+    top: 50,
+    left: 20,
     width: 40,
     height: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
   backButtonText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#2c3e50',
   },
   content: {
     padding: 24,
+    paddingBottom: 100, // Space for action buttons
   },
-  mealHeader: {
+  header: {
     marginBottom: 32,
   },
-  mealName: {
+  type: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4CAF50',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  name: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#2c3e50',
@@ -221,19 +238,28 @@ const styles = StyleSheet.create({
   restaurant: {
     fontSize: 18,
     color: '#7f8c8d',
-    marginBottom: 12,
+    marginBottom: 16,
+  },
+  priceCalorieRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   calorieContainer: {
-    alignSelf: 'flex-start',
-  },
-  calories: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FF9800',
-    backgroundColor: '#FFF3E0',
+    backgroundColor: '#FF9800',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
+  },
+  calories: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  price: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4CAF50',
   },
   section: {
     marginBottom: 32,
@@ -255,9 +281,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   tagText: {
-    color: '#fff',
+    fontSize: 12,
     fontWeight: '600',
-    fontSize: 14,
+    color: '#fff',
   },
   ingredientsContainer: {
     gap: 8,
@@ -266,70 +292,59 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  ingredientBullet: {
+  bullet: {
     fontSize: 16,
     color: '#4CAF50',
-    marginRight: 12,
-    fontWeight: 'bold',
+    marginRight: 8,
   },
   ingredientText: {
     fontSize: 16,
     color: '#2c3e50',
-    flex: 1,
   },
-  nutritionCard: {
+  description: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#7f8c8d',
+  },
+  actionContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  nutritionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  nutritionLabel: {
-    fontSize: 16,
-    color: '#2c3e50',
-  },
-  nutritionValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4CAF50',
-  },
-  footer: {
     padding: 24,
-    backgroundColor: '#fff',
+    paddingBottom: 40,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  addToCartButton: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  addToCartText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4CAF50',
   },
   orderButton: {
+    flex: 1,
     backgroundColor: '#4CAF50',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   orderButtonText: {
-    color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
+    color: '#fff',
   },
 });
+
+export default MealInfoScreen;

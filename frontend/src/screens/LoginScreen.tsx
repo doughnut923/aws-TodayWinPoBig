@@ -10,20 +10,21 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import { LoginScreenProps } from '../types';
 import { useAuth } from '../navigation/AppNavigator';
 
-export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { login } = useAuth();
 
-  const validateEmail = (email) => {
+  const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (): Promise<void> => {
     if (!email.trim()) {
       Alert.alert('Error', 'Please enter your email address');
       return;
@@ -51,8 +52,8 @@ export default function LoginScreen({ navigation }) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // In a real app, you would handle authentication here
-      // For now, we'll automatically log the user in and navigate to user info collection
-      login(); // This will trigger navigation to UserInfoStack
+      // The login() call will automatically trigger navigation via the auth context
+      login(); 
     } catch (error) {
       Alert.alert('Error', 'Login failed. Please try again.');
     } finally {
@@ -99,7 +100,7 @@ export default function LoginScreen({ navigation }) {
             </View>
 
             <TouchableOpacity
-              style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+              style={[styles.loginButton, isLoading && styles.disabledButton]}
               onPress={handleLogin}
               disabled={isLoading}
             >
@@ -108,18 +109,25 @@ export default function LoginScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Don't have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                <Text style={styles.signupLink}>Sign Up</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.forgotPasswordButton}
+              onPress={() => Alert.alert('Forgot Password', 'Feature coming soon!')}
+            >
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.signupText}>Don't have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+              <Text style={styles.signupLink}>Sign Up</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -128,19 +136,18 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
   },
   content: {
+    flex: 1,
     padding: 24,
-    justifyContent: 'center',
-    minHeight: '80%',
+    justifyContent: 'space-between',
   },
   header: {
-    alignItems: 'center',
+    marginTop: 60,
     marginBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 8,
@@ -148,10 +155,9 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#7f8c8d',
-    textAlign: 'center',
   },
   form: {
-    width: '100%',
+    flex: 1,
   },
   inputContainer: {
     marginBottom: 20,
@@ -169,14 +175,6 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
   },
   loginButton: {
     backgroundColor: '#4CAF50',
@@ -184,36 +182,39 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  loginButtonDisabled: {
+  disabledButton: {
     backgroundColor: '#a5d6a7',
+    opacity: 0.6,
   },
   loginButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
+  },
+  forgotPasswordButton: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  forgotPasswordText: {
+    color: '#4CAF50',
+    fontSize: 14,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 32,
+    marginTop: 40,
   },
-  footerText: {
-    fontSize: 16,
+  signupText: {
+    fontSize: 14,
     color: '#7f8c8d',
   },
   signupLink: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#4CAF50',
     fontWeight: 'bold',
   },
 });
+
+export default LoginScreen;

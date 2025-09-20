@@ -1,7 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { CustomButtonProps } from '../types';
 
-export default function CustomButton({ 
+const CustomButton: React.FC<CustomButtonProps> = ({ 
   title, 
   onPress, 
   style, 
@@ -9,9 +10,9 @@ export default function CustomButton({
   disabled = false, 
   loading = false,
   variant = 'primary' // 'primary', 'secondary', 'outline'
-}) {
-  const getButtonStyle = () => {
-    let baseStyle = [styles.button];
+}) => {
+  const getButtonStyle = (): (ViewStyle | undefined)[] => {
+    let baseStyle: (ViewStyle | undefined)[] = [styles.button];
     
     if (variant === 'primary') {
       baseStyle.push(styles.primaryButton);
@@ -32,8 +33,8 @@ export default function CustomButton({
     return baseStyle;
   };
 
-  const getTextStyle = () => {
-    let baseStyle = [styles.buttonText];
+  const getTextStyle = (): (TextStyle | undefined)[] => {
+    let baseStyle: (TextStyle | undefined)[] = [styles.buttonText];
     
     if (variant === 'primary') {
       baseStyle.push(styles.primaryButtonText);
@@ -64,7 +65,7 @@ export default function CustomButton({
       )}
     </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -111,3 +112,5 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
   },
 });
+
+export default CustomButton;

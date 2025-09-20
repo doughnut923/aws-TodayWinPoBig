@@ -1,7 +1,15 @@
 import React from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TextInputProps, ViewStyle, TextStyle } from 'react-native';
 
-export default function CustomInput({
+interface CustomInputProps extends Omit<TextInputProps, 'style'> {
+  label?: string;
+  style?: ViewStyle;
+  inputStyle?: TextStyle;
+  labelStyle?: TextStyle;
+  error?: string;
+}
+
+const CustomInput: React.FC<CustomInputProps> = ({
   label,
   value,
   onChangeText,
@@ -11,7 +19,7 @@ export default function CustomInput({
   labelStyle,
   error,
   ...props
-}) {
+}) => {
   return (
     <View style={[styles.container, style]}>
       {label && (
@@ -36,7 +44,7 @@ export default function CustomInput({
       )}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -73,3 +81,5 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 });
+
+export default CustomInput;
