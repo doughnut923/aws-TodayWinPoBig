@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { GetPlanResponse } from '../types';
-import { MealPlanAPI, APIError } from '../services';
+import { MealPlanAPI } from '../services/mealPlanAPI';
 
+// State interface for the meal plan hook
 interface UseMealPlanState {
   data: GetPlanResponse | null;
   formattedData: ReturnType<typeof MealPlanAPI.convertGetPlanResponse> | null;
@@ -9,16 +10,17 @@ interface UseMealPlanState {
   error: string | null;
 }
 
+// Return type interface for the hook
 interface UseMealPlanReturn extends UseMealPlanState {
   fetchMealPlan: (userID: string) => Promise<void>;
-  refetch: () => Promise<void>;
+  fetchMealPlanWithRetry: (userID: string, onRetry?: (attempt: number) => void) => Promise<void>;
+  refetch: () => void;
   clearError: () => void;
 }
 
 /**
- * Custom hook for managing meal plan data
- * @param userID - Optional user ID to fetch data on mount
- * @returns UseMealPlanReturn - State and functions for meal plan management
+ * Custom hook for managing meal plan data with API integration
+ * Supports both regular fetching and retry logic for empty meal plans
  */
 export const useMealPlan = (userID?: string): UseMealPlanReturn => {
   const [state, setState] = useState<UseMealPlanState>({
@@ -28,68 +30,83 @@ export const useMealPlan = (userID?: string): UseMealPlanReturn => {
     error: null,
   });
 
-  const [currentUserID, setCurrentUserID] = useState<string | undefined>(userID);
+  const [lastUserID, setLastUserID] = useState<string>('');
 
+  /**
+   * Regular meal plan fetch
+   */
   const fetchMealPlan = useCallback(async (id: string) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
-    
+    setLastUserID(id);
+
     try {
-      const response = await MealPlanAPI.getPlan(id);
-      const formatted = MealPlanAPI.convertGetPlanResponse(response);
-      
-      setState(prev => ({
-        ...prev,
-        data: response,
-        formattedData: formatted,
+      const apiResponse = await MealPlanAPI.getPlan(id);
+      const formattedResponse = MealPlanAPI.convertGetPlanResponse(apiResponse);
+
+      setState({
+        data: apiResponse,
+        formattedData: formattedResponse,
         loading: false,
-      }));
-      
-      setCurrentUserID(id);
-    } catch (error: any) {
-      let errorMessage = 'Failed to fetch meal plan';
-      
-      if (error instanceof APIError) {
-        if (error.status === 404) {
-          errorMessage = 'User not found';
-        } else if (error.status === 400) {
-          errorMessage = 'Invalid user ID';
-        } else if (error.status >= 500) {
-          errorMessage = 'Server error. Please try again later.';
-        } else {
-          errorMessage = error.message;
-        }
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
-      
+        error: null,
+      });
+    } catch (err: any) {
       setState(prev => ({
         ...prev,
         loading: false,
-        error: errorMessage,
+        error: err.message || 'Failed to fetch meal plan',
       }));
     }
   }, []);
 
-  const refetch = useCallback(async () => {
-    if (currentUserID) {
-      await fetchMealPlan(currentUserID);
-    }
-  }, [currentUserID, fetchMealPlan]);
+  /**
+   * Meal plan fetch with retry logic for empty responses
+   */
+  const fetchMealPlanWithRetry = useCallback(async (
+    id: string, 
+    onRetry?: (attempt: number) => void
+  ) => {
+    setState(prev => ({ ...prev, loading: true, error: null }));
+    setLastUserID(id);
 
+    try {
+      const apiResponse = await MealPlanAPI.getPlanWithRetry(id, onRetry);
+      const formattedResponse = MealPlanAPI.convertGetPlanResponse(apiResponse);
+
+      setState({
+        data: apiResponse,
+        formattedData: formattedResponse,
+        loading: false,
+        error: null,
+      });
+    } catch (err: any) {
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        error: err.message || 'Failed to fetch meal plan after multiple attempts',
+      }));
+    }
+  }, []);
+
+  /**
+   * Refetch using the last used userID
+   */
+  const refetch = useCallback(() => {
+    if (lastUserID) {
+      fetchMealPlan(lastUserID);
+    }
+  }, [lastUserID, fetchMealPlan]);
+
+  /**
+   * Clear error state
+   */
   const clearError = useCallback(() => {
     setState(prev => ({ ...prev, error: null }));
   }, []);
 
-  // Fetch on mount if userID is provided
-  useEffect(() => {
-    if (userID) {
-      fetchMealPlan(userID);
-    }
-  }, [userID, fetchMealPlan]);
-
   return {
     ...state,
     fetchMealPlan,
+    fetchMealPlanWithRetry,
     refetch,
     clearError,
   };

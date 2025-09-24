@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Image,
   Alert,
+  Linking,
 } from 'react-native';
 import { MealInfoScreenProps } from '../types';
 
@@ -16,79 +17,63 @@ interface NutritionalTag {
   color: string;
 }
 
-interface MealDetails {
-  ingredients: string[];
-  nutritionalTags: NutritionalTag[];
-}
-
-// Extended meal data with nutrition info
-const getMealDetails = (mealId: number): MealDetails => {
-  const mealDetails: Record<number, MealDetails> = {
-    1: {
-      ingredients: ['Whole grain bread', 'Avocado', 'Cherry tomatoes', 'Feta cheese', 'Olive oil', 'Lemon juice', 'Red pepper flakes'],
-      nutritionalTags: [
-        { name: 'High Fiber', color: '#4CAF50' },
-        { name: 'Vitamin E', color: '#FF9800' },
-        { name: 'Healthy Fats', color: '#2196F3' },
-        { name: 'Heart Healthy', color: '#E91E63' },
-      ],
-    },
-    2: {
-      ingredients: ['Grilled chicken breast', 'Mixed greens', 'Cucumber', 'Bell peppers', 'Red onion', 'Olive oil vinaigrette'],
-      nutritionalTags: [
-        { name: 'High Protein', color: '#FF5722' },
-        { name: 'Low Carb', color: '#9C27B0' },
-        { name: 'Vitamin C', color: '#FF9800' },
-        { name: 'Lean Muscle', color: '#607D8B' },
-      ],
-    },
-    3: {
-      ingredients: ['Atlantic salmon', 'Quinoa', 'Steamed broccoli', 'Lemon', 'Herbs', 'Olive oil'],
-      nutritionalTags: [
-        { name: 'Omega-3', color: '#2196F3' },
-        { name: 'Complete Protein', color: '#FF5722' },
-        { name: 'Brain Health', color: '#9C27B0' },
-        { name: 'Anti-inflammatory', color: '#4CAF50' },
-      ],
-    },
-  };
-
-  return mealDetails[mealId] || {
-    ingredients: ['Fresh ingredients', 'Seasonal vegetables', 'Quality proteins'],
-    nutritionalTags: [
-      { name: 'Nutritious', color: '#4CAF50' },
-      { name: 'Fresh', color: '#FF9800' },
-    ],
-  };
+// Generate nutritional tags based on meal properties
+const getNutritionalTags = (meal: any): NutritionalTag[] => {
+  const tags: NutritionalTag[] = [];
+  
+  if (meal.protein > 20) {
+    tags.push({ name: 'High Protein', color: '#FF5722' });
+  }
+  if (meal.carbs < 20) {
+    tags.push({ name: 'Low Carb', color: '#9C27B0' });
+  }
+  if (meal.fat > 15) {
+    tags.push({ name: 'Healthy Fats', color: '#2196F3' });
+  }
+  if (meal.calories < 400) {
+    tags.push({ name: 'Light Meal', color: '#4CAF50' });
+  }
+  if (meal.calories > 600) {
+    tags.push({ name: 'High Energy', color: '#FF9800' });
+  }
+  
+  // Add some default nutritional benefits
+  tags.push({ name: 'Nutritious', color: '#4CAF50' });
+  tags.push({ name: 'Fresh', color: '#FF9800' });
+  
+  return tags.slice(0, 4); // Limit to 4 tags
 };
 
 const MealInfoScreen: React.FC<MealInfoScreenProps> = ({ navigation, route }) => {
   const { meal } = route.params;
-  const mealDetails = getMealDetails(meal.id);
+  const nutritionalTags = getNutritionalTags(meal);
 
   const handleOrder = (): void => {
-    Alert.alert(
-      'Order Placed!',
-      `Your order for ${meal.name} has been placed successfully!`,
-      [
-        {
-          text: 'View Orders',
-          onPress: () => {
-            // In a real app, navigate to orders screen
-            Alert.alert('Coming Soon', 'Orders screen will be available soon!');
+    if (meal.purchase_url) {
+      Linking.openURL(meal.purchase_url).catch((err) => {
+        console.error('Failed to open URL:', err);
+        Alert.alert('Error', 'Could not open purchase link');
+      });
+    } else {
+      Alert.alert(
+        'Order Placed!',
+        `Your order for ${meal.name} has been placed successfully!`,
+        [
+          {
+            text: 'View Orders',
+            onPress: () => {
+              // In a real app, navigate to orders screen
+              Alert.alert('Coming Soon', 'Orders screen will be available soon!');
+            },
           },
-        },
-        {
-          text: 'Continue Shopping',
-          onPress: () => navigation.goBack(),
-          style: 'cancel',
-        },
-      ]
-    );
-  };
-
-  const handleAddToCart = (): void => {
-    Alert.alert('Added to Cart', `${meal.name} has been added to your cart!`);
+          {
+            text: 'Continue Shopping',
+            onPress: () => navigation.goBack(),
+            style: 'cancel',
+          },
+        ]
+      );
+    }
   };
 
   return (
@@ -128,7 +113,7 @@ const MealInfoScreen: React.FC<MealInfoScreenProps> = ({ navigation, route }) =>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Nutritional Benefits</Text>
             <View style={styles.tagsContainer}>
-              {mealDetails.nutritionalTags.map((tag, index) => (
+              {nutritionalTags.map((tag: NutritionalTag, index: number) => (
                 <View
                   key={index}
                   style={[styles.tag, { backgroundColor: tag.color }]}
@@ -143,7 +128,7 @@ const MealInfoScreen: React.FC<MealInfoScreenProps> = ({ navigation, route }) =>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Ingredients</Text>
             <View style={styles.ingredientsContainer}>
-              {mealDetails.ingredients.map((ingredient, index) => (
+              {meal.ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.ingredientItem}>
                   <Text style={styles.bullet}>•</Text>
                   <Text style={styles.ingredientText}>{ingredient}</Text>
@@ -164,19 +149,14 @@ const MealInfoScreen: React.FC<MealInfoScreenProps> = ({ navigation, route }) =>
       </ScrollView>
 
       {/* Action Buttons */}
-      <View style={styles.actionContainer}>
-        <TouchableOpacity
-          style={styles.addToCartButton}
-          onPress={handleAddToCart}
-        >
-          <Text style={styles.addToCartText}>Add to Cart</Text>
-        </TouchableOpacity>
-        
+      <View style={styles.actionContainer}>        
         <TouchableOpacity
           style={styles.orderButton}
           onPress={handleOrder}
         >
-          <Text style={styles.orderButtonText}>Order Now</Text>
+          <Text style={styles.orderButtonText}>
+            {meal.purchase_url ? 'Buy Online' : 'Order Now'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -318,20 +298,6 @@ const styles = StyleSheet.create({
     borderTopColor: '#e0e0e0',
     flexDirection: 'row',
     gap: 12,
-  },
-  addToCartButton: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  addToCartText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4CAF50',
   },
   orderButton: {
     flex: 1,

@@ -11,6 +11,8 @@ export interface Meal {
   calories: number;
   image: string;
   price?: number;
+  ingredients: string[];
+  purchase_url: string;
 }
 
 // API-specific Meal type (backend format)

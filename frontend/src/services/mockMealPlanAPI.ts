@@ -1,5 +1,14 @@
 import { GetPlanResponse, APIMeal } from '../types';
 
+// Test mode configuration - set to 'LOADING' to simulate empty responses
+export type MockTestMode = 'NORMAL' | 'LOADING';
+export let currentTestMode: MockTestMode = 'NORMAL';
+
+export const setMockTestMode = (mode: MockTestMode): void => {
+  currentTestMode = mode;
+  console.log(`[MockAPI] Test mode set to: ${mode}`);
+};
+
 // Mock meal data that matches the API response format
 const MOCK_API_MEALS: APIMeal[] = [
   {
@@ -9,7 +18,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["avocado", "whole grain bread", "cherry tomatoes", "olive oil", "sea salt"],
     Price: 12,
     Purchase_url: "https://example.com/order/avocado-toast",
-    Image_url: "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Avocado+Toast"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Grilled Chicken Salad",
@@ -18,7 +27,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["grilled chicken breast", "mixed greens", "cucumber", "bell peppers", "balsamic vinaigrette"],
     Price: 15,
     Purchase_url: "https://example.com/order/chicken-salad",
-    Image_url: "https://via.placeholder.com/300x200/FF9800/FFFFFF?text=Chicken+Salad"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Salmon & Quinoa",
@@ -27,7 +36,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["grilled salmon", "quinoa", "steamed broccoli", "lemon", "herbs"],
     Price: 22,
     Purchase_url: "https://example.com/order/salmon-quinoa",
-    Image_url: "https://via.placeholder.com/300x200/2196F3/FFFFFF?text=Salmon+Quinoa"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Greek Yogurt Parfait",
@@ -36,7 +45,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["greek yogurt", "granola", "fresh berries", "honey", "almonds"],
     Price: 8,
     Purchase_url: "https://example.com/order/yogurt-parfait",
-    Image_url: "https://via.placeholder.com/300x200/9C27B0/FFFFFF?text=Yogurt+Parfait"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Veggie Wrap",
@@ -45,7 +54,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["whole wheat tortilla", "hummus", "cucumber", "carrots", "sprouts", "bell peppers"],
     Price: 10,
     Purchase_url: "https://example.com/order/veggie-wrap",
-    Image_url: "https://via.placeholder.com/300x200/FF5722/FFFFFF?text=Veggie+Wrap"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Smoothie Bowl",
@@ -54,7 +63,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["acai", "banana", "berries", "coconut flakes", "chia seeds"],
     Price: 11,
     Purchase_url: "https://example.com/order/smoothie-bowl",
-    Image_url: "https://via.placeholder.com/300x200/E91E63/FFFFFF?text=Smoothie+Bowl"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Protein Box",
@@ -63,7 +72,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["grilled chicken", "hard boiled eggs", "nuts", "cheese", "apple slices"],
     Price: 16,
     Purchase_url: "https://example.com/order/protein-box",
-    Image_url: "https://via.placeholder.com/300x200/607D8B/FFFFFF?text=Protein+Box"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Buddha Bowl",
@@ -72,7 +81,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["quinoa", "roasted vegetables", "chickpeas", "avocado", "tahini dressing"],
     Price: 14,
     Purchase_url: "https://example.com/order/buddha-bowl",
-    Image_url: "https://via.placeholder.com/300x200/795548/FFFFFF?text=Buddha+Bowl"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Turkey Sandwich",
@@ -81,7 +90,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["whole grain bread", "sliced turkey", "lettuce", "tomato", "mustard"],
     Price: 9,
     Purchase_url: "https://example.com/order/turkey-sandwich",
-    Image_url: "https://via.placeholder.com/300x200/FF9800/FFFFFF?text=Turkey+Sandwich"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Overnight Oats",
@@ -90,7 +99,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["rolled oats", "almond milk", "chia seeds", "banana", "maple syrup"],
     Price: 7,
     Purchase_url: "https://example.com/order/overnight-oats",
-    Image_url: "https://via.placeholder.com/300x200/8BC34A/FFFFFF?text=Overnight+Oats"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Mediterranean Bowl",
@@ -99,7 +108,7 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["quinoa", "falafel", "cucumber", "tomato", "olives", "tzatziki"],
     Price: 17,
     Purchase_url: "https://example.com/order/mediterranean-bowl",
-    Image_url: "https://via.placeholder.com/300x200/3F51B5/FFFFFF?text=Mediterranean+Bowl"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   },
   {
     Name: "Green Smoothie",
@@ -108,9 +117,20 @@ const MOCK_API_MEALS: APIMeal[] = [
     Ingredients: ["spinach", "banana", "apple", "ginger", "coconut water"],
     Price: 6,
     Purchase_url: "https://example.com/order/green-smoothie",
-    Image_url: "https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Green+Smoothie"
+    Image_url: "https://plus.unsplash.com/premium_photo-1694547926001-f2151e4a476b?q=80&w=711&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
   }
 ];
+
+// Empty meal objects for LOADING mode testing
+const EMPTY_MEAL: APIMeal = {
+  Name: "",
+  Restaurant: "",
+  Calorie: 0,
+  Ingredients: [],
+  Price: 0,
+  Purchase_url: "",
+  Image_url: ""
+};
 
 /**
  * Mock Meal Plan API for development and testing
@@ -144,10 +164,21 @@ export class MockMealPlanAPI {
    * Mock implementation of getPlan endpoint
    */
   static async getPlan(userID: string): Promise<GetPlanResponse> {
-    console.log(`[MockAPI] Fetching meal plan for user: ${userID}`);
+    console.log(`[MockAPI] Fetching meal plan for user: ${userID}, mode: ${currentTestMode}`);
     
     // Simulate API delay
     await this.simulateDelay();
+
+    // In LOADING mode, return empty meals to simulate the server not ready
+    if (currentTestMode === 'LOADING') {
+      console.log(`[MockAPI] Returning empty meal plan (LOADING mode)`);
+      return {
+        morn: EMPTY_MEAL,
+        afternoon: EMPTY_MEAL,
+        dinner: EMPTY_MEAL,
+        Alt: []
+      };
+    }
 
     // Simulate occasional errors for testing (5% chance)
     if (Math.random() < 0.05) {

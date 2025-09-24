@@ -12,6 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import MealCard from '../components/MealCard';
+import { MealPlanLoading } from '../components';
 import { Meal, HomeScreenProps } from '../types';
 import { useAuth } from '../navigation/AppNavigator';
 import { useMealPlan } from '../hooks';
@@ -33,21 +34,49 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     loading: mealPlanLoading, 
     error: mealPlanError, 
     fetchMealPlan,
+    fetchMealPlanWithRetry,
     refetch: refetchMealPlan
   } = useMealPlan();
   
-  // State management for checked meals
+  // State management for checked meals and retry logic
   const [checkedMeals, setCheckedMeals] = useState<Set<number>>(new Set());
+  const [isRetryMode, setIsRetryMode] = useState<boolean>(false);
+  const [retryAttempt, setRetryAttempt] = useState<number>(0);
   
   // Animated values
   const progressWidth = useRef(new Animated.Value(0)).current;
   const calorieCount = useRef(new Animated.Value(0)).current;
   const progressOpacity = useRef(new Animated.Value(1)).current;
   
+  // Handle retry callback for empty meal plans
+  const handleRetryCallback = (attempt: number) => {
+    setRetryAttempt(attempt);
+  };
+
+  // Function to fetch meal plan with retry logic
+  const fetchMealPlanWithRetryLogic = async (id: string) => {
+    setIsRetryMode(true);
+    setRetryAttempt(1);
+    
+    try {
+      await fetchMealPlanWithRetry(id, handleRetryCallback);
+      setIsRetryMode(false);
+      setRetryAttempt(0);
+    } catch (error) {
+      setIsRetryMode(false);
+      setRetryAttempt(0);
+      // Error is already handled by the useMealPlan hook
+    }
+  };
+  
   // Fetch meal plan on component mount or when userID changes
   useEffect(() => {
     if (userID || !userData) { // Fetch even if userID is null (will use mock data)
-      fetchMealPlan(userID || 'guest_user');
+      // First try regular fetch, if it returns empty, switch to retry mode
+      fetchMealPlan(userID || 'guest_user').then(() => {
+        // Check if the meal plan is empty and needs retry
+        // This will be handled by the component rendering logic
+      });
     }
   }, [userID, fetchMealPlan, userData]);
   
@@ -205,6 +234,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         return 'Personalized calorie target';
     }
   };
+
+  // Check if meal plan is empty or has empty meals
+  const isMealPlanEmpty = (): boolean => {
+    if (!mealPlanData) return false;
+    
+    const isMealEmpty = (meal: any): boolean => {
+      return !meal || !meal.name || meal.name.trim() === '' || 
+             !meal.restaurant || meal.restaurant.trim() === '' || 
+             meal.calories <= 0;
+    };
+    
+    return isMealEmpty(mealPlanData.morning) || 
+           isMealEmpty(mealPlanData.afternoon) || 
+           isMealEmpty(mealPlanData.dinner);
+  };
+
+  // Auto-trigger retry mode if meal plan is empty
+  useEffect(() => {
+    if (mealPlanData && isMealPlanEmpty() && !isRetryMode && !mealPlanLoading) {
+      console.log('[HomeScreen] Detected empty meal plan, switching to retry mode');
+      const currentUserID = userID || 'guest_user';
+      fetchMealPlanWithRetryLogic(currentUserID);
+    }
+  }, [mealPlanData, isRetryMode, mealPlanLoading, userID]);
+
+  // Show loading screen if in retry mode or if initial loading with no data
+  if (isRetryMode || (mealPlanLoading && !mealPlanData)) {
+    return (
+      <MealPlanLoading 
+        attempt={retryAttempt} 
+        message={isRetryMode ? "Tailoring a meal plan for you" : "Loading your meal plan"}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
