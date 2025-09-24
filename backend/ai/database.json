@@ -1,0 +1,842 @@
+{
+  "restaurants": [
+    {
+      "restaurant_id": "REST1025",
+      "name": "Pasta Palace",
+      "items": [
+        {
+          "id": "APP101",
+          "name": "Garlic Breadsticks",
+          "calories": 280,
+          "protein": 8,
+          "carbs": 40,
+          "health_tags": [
+            "high in sodium",
+            "good source of B vitamins",
+            "moderate fiber"
+          ]
+        },
+        {
+          "id": "APP102",
+          "name": "Bruschetta",
+          "calories": 250,
+          "protein": 6,
+          "carbs": 35,
+          "health_tags": [
+            "high in vitamin C (from tomatoes)",
+            "rich in antioxidants",
+            "low sodium",
+            "good source of lycopene"
+          ]
+        },
+        {
+          "id": "PASTA001",
+          "name": "Spaghetti Carbonara",
+          "calories": 650,
+          "protein": 25,
+          "carbs": 70,
+          "health_tags": [
+            "high in sodium",
+            "rich in protein",
+            "good source of B vitamins",
+            "high cholesterol"
+          ]
+        },
+        {
+          "id": "PASTA002",
+          "name": "Margherita Pasta",
+          "calories": 550,
+          "protein": 18,
+          "carbs": 80,
+          "health_tags": [
+            "high in vitamin C (from tomatoes and basil)",
+            "moderate fiber",
+            "rich in lycopene",
+            "good source of calcium (from cheese)"
+          ]
+        },
+        {
+          "id": "PASTA003",
+          "name": "Seafood Linguine",
+          "calories": 620,
+          "protein": 35,
+          "carbs": 65,
+          "health_tags": [
+            "high in omega-3 fatty acids",
+            "rich in protein",
+            "good source of vitamin D (from seafood)",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "DESS001",
+          "name": "Tiramisu",
+          "calories": 420,
+          "protein": 6,
+          "carbs": 55,
+          "health_tags": [
+            "high in calcium (from mascarpone)",
+            "moderate caffeine (from coffee)",
+            "high sugar",
+            "low fiber"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1026",
+      "name": "Taco Haven",
+      "items": [
+        {
+          "id": "TACO001",
+          "name": "Carne Asada Tacos",
+          "calories": 450,
+          "protein": 28,
+          "carbs": 40,
+          "health_tags": [
+            "rich in protein",
+            "good source of iron and B vitamins (from beef)",
+            "high sodium",
+            "moderate vitamin C (from lime)"
+          ]
+        },
+        {
+          "id": "TACO002",
+          "name": "Veggie Tacos",
+          "calories": 350,
+          "protein": 10,
+          "carbs": 50,
+          "health_tags": [
+            "high in fiber",
+            "rich in vitamin A and C (from veggies and avocado)",
+            "low sodium",
+            "good source of potassium"
+          ]
+        },
+        {
+          "id": "TACO003",
+          "name": "Fish Tacos",
+          "calories": 400,
+          "protein": 25,
+          "carbs": 45,
+          "health_tags": [
+            "high in omega-3 fatty acids",
+            "rich in protein",
+            "good source of vitamin D (from fish)",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "BURR001",
+          "name": "Chicken Burrito",
+          "calories": 750,
+          "protein": 35,
+          "carbs": 90,
+          "health_tags": [
+            "rich in protein",
+            "high in sodium",
+            "good source of B vitamins (from chicken)",
+            "moderate fiber (from beans)"
+          ]
+        },
+        {
+          "id": "BURR002",
+          "name": "Quinoa Bowl",
+          "calories": 600,
+          "protein": 30,
+          "carbs": 70,
+          "health_tags": [
+            "high in protein and fiber",
+            "rich in magnesium (from quinoa)",
+            "good source of vitamin C (from veggies)",
+            "healthy fats (from guacamole)"
+          ]
+        },
+        {
+          "id": "BURR003",
+          "name": "Bean Burrito",
+          "calories": 650,
+          "protein": 20,
+          "carbs": 85,
+          "health_tags": [
+            "high in fiber",
+            "good source of plant-based protein",
+            "rich in folate and potassium (from beans)",
+            "moderate sodium"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1027",
+      "name": "Burger Barn",
+      "items": [
+        {
+          "id": "BURG001",
+          "name": "Classic Cheeseburger",
+          "calories": 620,
+          "protein": 32,
+          "carbs": 45,
+          "health_tags": [
+            "rich in protein",
+            "high in saturated fats",
+            "good source of B vitamins and iron (from beef)",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "BURG002",
+          "name": "Veggie Burger",
+          "calories": 500,
+          "protein": 20,
+          "carbs": 55,
+          "health_tags": [
+            "high in fiber",
+            "rich in vitamin E (from avocado)",
+            "plant-based protein",
+            "low saturated fat"
+          ]
+        },
+        {
+          "id": "BURG003",
+          "name": "Bacon BBQ Burger",
+          "calories": 750,
+          "protein": 35,
+          "carbs": 50,
+          "health_tags": [
+            "high in protein",
+            "high sodium and saturated fats",
+            "good source of B vitamins (from pork and beef)",
+            "moderate iron"
+          ]
+        },
+        {
+          "id": "SIDE001",
+          "name": "French Fries",
+          "calories": 350,
+          "protein": 4,
+          "carbs": 45,
+          "health_tags": [
+            "high in sodium",
+            "low fiber",
+            "moderate potassium (from potatoes)",
+            "high in unhealthy fats if fried"
+          ]
+        },
+        {
+          "id": "SIDE002",
+          "name": "Onion Rings",
+          "calories": 420,
+          "protein": 5,
+          "carbs": 50,
+          "health_tags": [
+            "high in sodium",
+            "low protein",
+            "moderate vitamin C (from onions)",
+            "high in calories from frying"
+          ]
+        },
+        {
+          "id": "SIDE003",
+          "name": "Sweet Potato Fries",
+          "calories": 320,
+          "protein": 3,
+          "carbs": 40,
+          "health_tags": [
+            "high in vitamin A and C",
+            "good source of fiber and potassium",
+            "lower glycemic index",
+            "moderate sodium"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1028",
+      "name": "Sushi Spot",
+      "items": [
+        {
+          "id": "SUSH001",
+          "name": "California Roll",
+          "calories": 300,
+          "protein": 12,
+          "carbs": 40,
+          "health_tags": [
+            "rich in omega-3 (from crab)",
+            "good source of vitamin E (from avocado)",
+            "high sodium (from soy)",
+            "moderate fiber"
+          ]
+        },
+        {
+          "id": "SUSH002",
+          "name": "Veggie Roll",
+          "calories": 220,
+          "protein": 4,
+          "carbs": 45,
+          "health_tags": [
+            "high in vitamin A and C (from veggies)",
+            "rich in fiber",
+            "low calorie",
+            "good source of potassium"
+          ]
+        },
+        {
+          "id": "SUSH003",
+          "name": "Spicy Tuna Roll",
+          "calories": 350,
+          "protein": 18,
+          "carbs": 40,
+          "health_tags": [
+            "high in omega-3 and protein (from tuna)",
+            "good source of vitamin D and selenium",
+            "high sodium (from spicy mayo)"
+          ]
+        },
+        {
+          "id": "NIG001",
+          "name": "Salmon Nigiri",
+          "calories": 80,
+          "protein": 8,
+          "carbs": 10,
+          "health_tags": [
+            "rich in omega-3 and vitamin D",
+            "high in protein",
+            "good source of B vitamins",
+            "low carbs"
+          ]
+        },
+        {
+          "id": "NIG002",
+          "name": "Tuna Sashimi",
+          "calories": 150,
+          "protein": 25,
+          "carbs": 0,
+          "health_tags": [
+            "high in protein and omega-3",
+            "rich in vitamin B12 and selenium",
+            "low calorie",
+            "no carbs"
+          ]
+        },
+        {
+          "id": "NIG003",
+          "name": "Eel Nigiri",
+          "calories": 120,
+          "protein": 10,
+          "carbs": 12,
+          "health_tags": [
+            "rich in omega-3 and vitamin A",
+            "good source of protein",
+            "moderate sodium",
+            "high in healthy fats"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1029",
+      "name": "Wok Way",
+      "items": [
+        {
+          "id": "STIR001",
+          "name": "Kung Pao Chicken",
+          "calories": 520,
+          "protein": 28,
+          "carbs": 45,
+          "health_tags": [
+            "rich in protein",
+            "high in vitamin C (from peppers)",
+            "good source of antioxidants",
+            "high sodium (from sauce)"
+          ]
+        },
+        {
+          "id": "STIR002",
+          "name": "Vegetable Stir-Fry",
+          "calories": 300,
+          "protein": 8,
+          "carbs": 40,
+          "health_tags": [
+            "high in vitamins A and C",
+            "rich in fiber",
+            "low calorie",
+            "good source of potassium"
+          ]
+        },
+        {
+          "id": "STIR003",
+          "name": "Beef Broccoli",
+          "calories": 480,
+          "protein": 30,
+          "carbs": 30,
+          "health_tags": [
+            "rich in protein and iron (from beef)",
+            "high in vitamin C and K (from broccoli)",
+            "moderate fiber",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "NOOD001",
+          "name": "Lo Mein",
+          "calories": 550,
+          "protein": 22,
+          "carbs": 75,
+          "health_tags": [
+            "moderate protein",
+            "high in carbs",
+            "good source of B vitamins (from noodles)",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "NOOD002",
+          "name": "Fried Rice",
+          "calories": 450,
+          "protein": 15,
+          "carbs": 60,
+          "health_tags": [
+            "moderate protein",
+            "high in carbs",
+            "good source of vitamin A (from peas)",
+            "high sodium and cholesterol (from eggs)"
+          ]
+        },
+        {
+          "id": "NOOD003",
+          "name": "Pad Thai",
+          "calories": 580,
+          "protein": 18,
+          "carbs": 80,
+          "health_tags": [
+            "high in carbs",
+            "good source of vitamin C (from lime)",
+            "moderate fiber (from veggies)",
+            "high sodium (from sauce)"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1030",
+      "name": "Bistro Bliss",
+      "items": [
+        {
+          "id": "APP201",
+          "name": "Escargot",
+          "calories": 200,
+          "protein": 20,
+          "carbs": 5,
+          "health_tags": [
+            "rich in protein and iron",
+            "good source of B12",
+            "low carbs",
+            "high cholesterol"
+          ]
+        },
+        {
+          "id": "APP202",
+          "name": "French Onion Soup",
+          "calories": 380,
+          "protein": 12,
+          "carbs": 30,
+          "health_tags": [
+            "high in sodium",
+            "good source of vitamin C (from onions)",
+            "moderate calcium (from cheese)",
+            "rich in antioxidants"
+          ]
+        },
+        {
+          "id": "ENT001",
+          "name": "Coq au Vin",
+          "calories": 550,
+          "protein": 35,
+          "carbs": 25,
+          "health_tags": [
+            "rich in protein and B vitamins (from chicken)",
+            "moderate iron",
+            "low carbs",
+            "high in antioxidants (from wine)"
+          ]
+        },
+        {
+          "id": "ENT002",
+          "name": "Ratatouille",
+          "calories": 350,
+          "protein": 8,
+          "carbs": 50,
+          "health_tags": [
+            "high in vitamins A and C",
+            "rich in fiber and antioxidants",
+            "low calorie",
+            "good source of potassium"
+          ]
+        },
+        {
+          "id": "ENT003",
+          "name": "Beef Bourguignon",
+          "calories": 650,
+          "protein": 40,
+          "carbs": 30,
+          "health_tags": [
+            "high in protein and iron",
+            "good source of B vitamins",
+            "moderate fiber (from veggies)",
+            "high saturated fats"
+          ]
+        },
+        {
+          "id": "ENT004",
+          "name": "Salmon en Papillote",
+          "calories": 450,
+          "protein": 32,
+          "carbs": 20,
+          "health_tags": [
+            "rich in omega-3 and vitamin D",
+            "high in protein",
+            "good source of B vitamins",
+            "low carbs"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1031",
+      "name": "Spice Thai",
+      "items": [
+        {
+          "id": "APP301",
+          "name": "Spring Rolls",
+          "calories": 300,
+          "protein": 10,
+          "carbs": 40,
+          "health_tags": [
+            "moderate protein",
+            "high in vitamin A (from veggies)",
+            "low fiber if fried",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "APP302",
+          "name": "Tom Yum Soup",
+          "calories": 200,
+          "protein": 15,
+          "carbs": 15,
+          "health_tags": [
+            "high in vitamin C (from lime and lemongrass)",
+            "rich in antioxidants",
+            "low calorie",
+            "good source of protein (from shrimp)"
+          ]
+        },
+        {
+          "id": "CURR001",
+          "name": "Green Curry Chicken",
+          "calories": 550,
+          "protein": 28,
+          "carbs": 40,
+          "health_tags": [
+            "rich in protein",
+            "high in vitamin C and A (from eggplant and curry)",
+            "good source of healthy fats (from coconut)",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "CURR002",
+          "name": "Pad See Ew",
+          "calories": 600,
+          "protein": 25,
+          "carbs": 80,
+          "health_tags": [
+            "high in carbs",
+            "moderate protein",
+            "good source of vitamin K (from broccoli)",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "CURR003",
+          "name": "Massaman Curry",
+          "calories": 520,
+          "protein": 18,
+          "carbs": 50,
+          "health_tags": [
+            "high in potassium (from potatoes)",
+            "good source of fiber and healthy fats (from coconut)",
+            "moderate vitamin C",
+            "low spice for sensitive stomachs"
+          ]
+        },
+        {
+          "id": "CURR004",
+          "name": "Basil Chicken Stir-Fry",
+          "calories": 450,
+          "protein": 30,
+          "carbs": 25,
+          "health_tags": [
+            "rich in protein",
+            "high in vitamin K (from basil)",
+            "good source of iron",
+            "moderate antioxidants"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1032",
+      "name": "Olive Grove",
+      "items": [
+        {
+          "id": "MEZZ001",
+          "name": "Hummus",
+          "calories": 250,
+          "protein": 8,
+          "carbs": 30,
+          "health_tags": [
+            "high in fiber and plant-based protein",
+            "rich in folate and manganese (from chickpeas)",
+            "good source of healthy fats",
+            "low sodium if homemade"
+          ]
+        },
+        {
+          "id": "MEZZ002",
+          "name": "Falafel",
+          "calories": 350,
+          "protein": 12,
+          "carbs": 40,
+          "health_tags": [
+            "high in fiber and plant protein",
+            "rich in iron and folate",
+            "good source of vitamin C (with tahini)",
+            "moderate sodium"
+          ]
+        },
+        {
+          "id": "MEZZ003",
+          "name": "Stuffed Grape Leaves",
+          "calories": 280,
+          "protein": 6,
+          "carbs": 45,
+          "health_tags": [
+            "high in fiber",
+            "rich in vitamin K and C (from herbs and leaves)",
+            "good source of antioxidants",
+            "low calorie"
+          ]
+        },
+        {
+          "id": "MAIN101",
+          "name": "Lamb Gyro",
+          "calories": 580,
+          "protein": 32,
+          "carbs": 50,
+          "health_tags": [
+            "high in protein and B vitamins (from lamb)",
+            "good source of iron",
+            "moderate vitamin C (from veggies)",
+            "high sodium"
+          ]
+        },
+        {
+          "id": "MAIN102",
+          "name": "Grilled Octopus",
+          "calories": 300,
+          "protein": 35,
+          "carbs": 10,
+          "health_tags": [
+            "rich in protein and omega-3",
+            "high in vitamin B12 and iron",
+            "low carbs",
+            "good source of selenium"
+          ]
+        },
+        {
+          "id": "MAIN103",
+          "name": "Vegetable Moussaka",
+          "calories": 450,
+          "protein": 15,
+          "carbs": 55,
+          "health_tags": [
+            "high in fiber and vitamins A and C (from eggplant/zucchini)",
+            "good source of calcium (from bechamel)",
+            "moderate protein",
+            "rich in antioxidants"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1033",
+      "name": "Smoke Shack",
+      "items": [
+        {
+          "id": "BBQ001",
+          "name": "Brisket Plate",
+          "calories": 700,
+          "protein": 45,
+          "carbs": 20,
+          "health_tags": [
+            "high in protein and iron",
+            "good source of B vitamins",
+            "high saturated fats and sodium",
+            "moderate zinc"
+          ]
+        },
+        {
+          "id": "BBQ002",
+          "name": "Ribs",
+          "calories": 650,
+          "protein": 40,
+          "carbs": 15,
+          "health_tags": [
+            "rich in protein and B vitamins (from pork)",
+            "high in sodium and fats",
+            "good source of zinc",
+            "low carbs"
+          ]
+        },
+        {
+          "id": "BBQ003",
+          "name": "Pulled Pork",
+          "calories": 550,
+          "protein": 35,
+          "carbs": 25,
+          "health_tags": [
+            "high in protein",
+            "good source of B vitamins and iron",
+            "high sodium (from sauce)",
+            "moderate fiber if with sides"
+          ]
+        },
+        {
+          "id": "SIDE101",
+          "name": "Coleslaw",
+          "calories": 150,
+          "protein": 2,
+          "carbs": 15,
+          "health_tags": [
+            "high in vitamin C and K (from cabbage)",
+            "good source of fiber",
+            "low calorie",
+            "moderate sodium"
+          ]
+        },
+        {
+          "id": "SIDE102",
+          "name": "Baked Beans",
+          "calories": 200,
+          "protein": 8,
+          "carbs": 35,
+          "health_tags": [
+            "high in fiber and plant protein",
+            "rich in folate and magnesium",
+            "good source of antioxidants",
+            "high in sugar/sodium"
+          ]
+        },
+        {
+          "id": "SIDE103",
+          "name": "Cornbread",
+          "calories": 250,
+          "protein": 5,
+          "carbs": 40,
+          "health_tags": [
+            "high in carbs",
+            "good source of B vitamins",
+            "moderate fiber",
+            "high in comfort carbs but watch sodium"
+          ]
+        }
+      ]
+    },
+    {
+      "restaurant_id": "REST1034",
+      "name": "Green Leaf",
+      "items": [
+        {
+          "id": "SALAD001",
+          "name": "Kale Caesar Salad",
+          "calories": 250,
+          "protein": 10,
+          "carbs": 25,
+          "health_tags": [
+            "high in vitamins A, C, and K (from kale)",
+            "rich in antioxidants and fiber",
+            "good source of calcium",
+            "low calorie"
+          ]
+        },
+        {
+          "id": "SALAD002",
+          "name": "Quinoa Buddha Bowl",
+          "calories": 450,
+          "protein": 15,
+          "carbs": 60,
+          "health_tags": [
+            "high in protein and fiber (from quinoa)",
+            "rich in magnesium and iron",
+            "good source of healthy fats (from tahini/nuts)",
+            "vitamin-rich veggies"
+          ]
+        },
+        {
+          "id": "SALAD003",
+          "name": "Chickpea Salad",
+          "calories": 350,
+          "protein": 12,
+          "carbs": 50,
+          "health_tags": [
+            "high in fiber and plant protein",
+            "rich in folate and vitamin C (from tomatoes/cucumber)",
+            "good source of potassium",
+            "low fat"
+          ]
+        },
+        {
+          "id": "WRAP001",
+          "name": "Falafel Wrap",
+          "calories": 500,
+          "protein": 18,
+          "carbs": 65,
+          "health_tags": [
+            "high in fiber and plant protein",
+            "rich in iron and folate (from chickpeas)",
+            "good source of vitamin C (from greens)",
+            "moderate healthy fats"
+          ]
+        },
+        {
+          "id": "WRAP002",
+          "name": "Portobello Burger",
+          "calories": 450,
+          "protein": 15,
+          "carbs": 50,
+          "health_tags": [
+            "high in fiber and B vitamins (from mushrooms)",
+            "plant-based protein",
+            "rich in vitamin D (if fortified)",
+            "low saturated fat"
+          ]
+        },
+        {
+          "id": "WRAP003",
+          "name": "Stuffed Peppers",
+          "calories": 400,
+          "protein": 12,
+          "carbs": 55,
+          "health_tags": [
+            "high in vitamins A and C (from peppers)",
+            "rich in fiber and antioxidants",
+            "good source of plant protein (from rice/beans)",
+            "moderate potassium"
+          ]
+        }
+      ]
+    }
+  ]
+}

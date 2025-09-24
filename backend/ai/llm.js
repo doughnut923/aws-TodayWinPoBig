@@ -1,5 +1,10 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 
+// Read file synchronously
+const basicPrompt = fs.readFileSync('prompt.txt', 'utf8');
+const databasePrompt = fs.readFileSync('database.json', 'utf8');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 console.log(OPENROUTER_API_KEY);
@@ -45,4 +50,4 @@ module.exports = {
   callLLM
 }
 
-callLLM("Give me a healthy meal plan for a day");
+callLLM(basicPrompt + '/n' + databasePrompt);
