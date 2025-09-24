@@ -55,7 +55,7 @@ export default function UserInfoGoalsScreen({ navigation, route }) {
       console.log('User Data:', completeUserData);
       
       // Complete the onboarding process
-      completeOnboarding(); // This will navigate to the main app
+      completeOnboarding(completeUserData); // This will navigate to the main app
     } catch (error) {
       Alert.alert('Error', 'Failed to save your information. Please try again.');
     }
