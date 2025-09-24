@@ -1,36 +1,46 @@
-# AWS AI HACKATHON - SMART FOOD DELIVERY NUTRITION TRACKING SYSTEM
-> "Eat Fast Eat Healthy"
+# Nutri2Go 🥀
 
-The project will be a mobile food delievery application with nutrition information tracking to provide user with a healthy lifestyle together with convinence. 
+AWS AI Hackathon Hong Kong 2025
 
-## Frameworks:
-- Frontend: Expo React Native
-- Backend:
+---
 
-## Frontend
+## Introduction
 
-Pages: 
-    1. Login: Simple Login page with email and password
-    2. Signup: Simple Signup page with email and password
-    3. User Info Gathering: 4 Seperate pages will collect the following information:
-    - Name
-    - Age
-    - Weight and Height
-    - Goals (weight loss, muscle gain, healthy eating) 
-    + and these information will be uploaded to the database
-    4. Homepage:
-    Will have a text "Welcome [name]"
-    At the top will be the daily calorie target and a progress bar
-    Will contain 3 cards for Breakfast, lunch, Dinner Recommendation with their own image, meal name and calorie data, on click will direct to the meal info page(5) to show the detailed information
-    Bellow will be 6 more alternative meals
-    5. Meal Info Page:
-    Contain more detailed information about the meals:
-    - meal name
-    - Restaurant
-    - calorie data
-    - ingredients
-    - multiple colored food tags e.g. (vitamin C, stress Relieve, Summer Special etc.)
-    And there will be a button to allow user to order the meal directly
+Nutri2Go is a mobile food delivery application that combines **convenience with healthy eating** by providing personalized meal recommendations based on users' health goals.
 
-    
+## Problem Statement❓
 
+Living in Hong Kong is not easy, with its fast-paced lifestyle, long working hours, and limited time for home-cooked meals, people often sacrifice nutrition for convenience. This leads to unhealthy eating habits, inconsistent diets, and difficulty in achieving fitness or wellness goals. 
+
+In fact, this trend could be supported by data: 
+
+- Hong Kong office workers often have short lunch breaks (sometimes as short as **30 minutes**), making convenience a **top priority for lunch choices**, with many opting for **quick meals or food delivery to maximize break time**
+- Only about **3% of Hong Kong** adults consume the recommended five or more servings of fruits and vegetables daily, with many **falling short of this healthier diet guideline**
+- Despite some resurgence in dine-in dining post-pandemic, **59%-65%** of restaurants still report **significant revenue** from takeaway or delivery, highlighting that a considerable portion customers **relies heavily on food delivery services** alongside dining in.
+
+Thus the challenge is clear: **how can busy urban professionals enjoy the speed and ease of food delivery while staying aligned with their personal health objectives?**
+
+## **Key Features ✨**
+
+### **Personalized Nutrition Tracking**
+
+- Calculates daily calorie targets using BMR (Basal Metabolic Rate) based on user's age, weight, height
+- Supports different health goals: **Weight Loss**, **Muscle Gain**, or **Healthy Eating**
+- Real-time calorie tracking with animated progress bars
+
+### **Smart Meal Planning**
+
+- AI-powered meal recommendations (morning, afternoon, dinner + alternatives)
+- Each meal shows: restaurant, calories, ingredients, price, and nutritional tags
+- Users can check off ordered meals to automatically track calories
+
+## Project Structure 🔰
+
+- [Frontend](/frontend/README.md)
+- Backend
+
+## Developer Q Adaptation 🤖
+
+- Facilitate code generation tools to significantly **reduce development time**
+- Generated documentation to ensure code readability
+- Assisted deployment on AWS to integrate with **Docker and K8s**
