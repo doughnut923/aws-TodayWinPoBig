@@ -3,13 +3,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 
 // Import screens
-import LoginScreen from '../screens/LoginScreen';
+import LoginScreen from '../screens/LoginScreenRedux';
 import MealInfoScreen from '../screens/MealInfoScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import SignupScreen from '../screens/SignupScreen';
+import SignupScreen from '../screens/SignupScreenRedux';
 import UserInfoNameScreen from '../screens/UserInfoNameScreen';
 import UserInfoAgeScreen from '../screens/UserInfoAgeScreen';
 import UserInfoPhysicalScreen from '../screens/UserInfoPhysicalScreen';
@@ -83,8 +84,41 @@ function MainTabNavigator() {
 
 // User information collection stack
 function UserInfoStack() {
+  const { user } = useSelector((state: any) => state.auth);
+  
+  // Determine the first incomplete step
+  let initialRouteName: keyof UserInfoStackParamList = 'UserInfoName';
+  
+  if (user) {
+    console.log('=== DETERMINING INITIAL USERINFO ROUTE ===');
+    console.log('User data:', {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      age: user.age,
+      height: user.height,
+      weight: user.weight,
+      goal: user.goal
+    });
+    
+    if (user.firstName && user.lastName) {
+      if (!user.age) {
+        initialRouteName = 'UserInfoAge';
+        console.log('Starting from UserInfoAge - user has name but missing age');
+      } else if (!user.height || !user.weight) {
+        initialRouteName = 'UserInfoPhysical';
+        console.log('Starting from UserInfoPhysical - user has name and age but missing height/weight');
+      } else if (!user.goal) {
+        initialRouteName = 'UserInfoGoals';
+        console.log('Starting from UserInfoGoals - user has name, age, physical but missing goal');
+      }
+    }
+    
+    console.log('Initial route name:', initialRouteName);
+  }
+  
   return (
     <UserInfoStackNavigator.Navigator
+      initialRouteName={initialRouteName}
       screenOptions={{
         headerShown: false,
       }}
@@ -114,7 +148,23 @@ function AuthStack() {
 
 // Root navigator
 function RootNavigator() {
-  const { isLoggedIn, hasCompletedOnboarding } = useAuth();
+  const { isAuthenticated, user } = useSelector((state: any) => state.auth);
+  const hasCompletedOnboarding = user?.profileCompleted || false;
+  
+  console.log('=== ROOT NAVIGATOR STATE ===');
+  console.log('isAuthenticated:', isAuthenticated);
+  console.log('user?.profileCompleted:', user?.profileCompleted);
+  console.log('hasCompletedOnboarding:', hasCompletedOnboarding);
+  if (user) {
+    console.log('User has required fields:');
+    console.log('- firstName:', !!user.firstName);
+    console.log('- lastName:', !!user.lastName);
+    console.log('- age:', !!user.age);
+    console.log('- height:', !!user.height);
+    console.log('- weight:', !!user.weight);
+    console.log('- goal:', !!user.goal);
+  }
+  console.log('Navigation decision:', !isAuthenticated ? 'Auth' : !hasCompletedOnboarding ? 'UserInfoFlow' : 'Main');
 
   return (
     <Stack.Navigator
@@ -122,7 +172,7 @@ function RootNavigator() {
         headerShown: false,
       }}
     >
-      {!isLoggedIn ? (
+      {!isAuthenticated ? (
         <Stack.Screen name="Auth" component={AuthStack} />
       ) : !hasCompletedOnboarding ? (
         <Stack.Screen name="UserInfoFlow" component={UserInfoStack} />

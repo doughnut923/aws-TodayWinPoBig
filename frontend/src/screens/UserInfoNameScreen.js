@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,25 @@ import {
   Platform,
   SafeAreaView,
 } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProfile } from '../store/slices/authSlice';
 
 export default function UserInfoNameScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
-  const handleNext = () => {
+  useEffect(() => {
+    // Pre-populate with existing data if available
+    if (user) {
+      setFirstName(user.firstName || '');
+      setLastName(user.lastName || '');
+    }
+  }, [user]);
+
+  const handleNext = async () => {
     if (!firstName.trim()) {
       Alert.alert('Required', 'Please enter your first name');
       return;
@@ -26,13 +39,25 @@ export default function UserInfoNameScreen({ navigation }) {
       return;
     }
 
-    // Store user data (in a real app, you'd use context or state management)
-    navigation.navigate('UserInfoAge', {
-      userData: {
+    try {
+      // Update user profile with Redux
+      const profileData = {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
+      };
+      
+      console.log('Updating profile with name data:', profileData);
+      const resultAction = await dispatch(updateProfile(profileData));
+      
+      if (updateProfile.fulfilled.match(resultAction)) {
+        navigation.navigate('UserInfoAge');
+      } else {
+        Alert.alert('Error', 'Failed to save profile information');
       }
-    });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'Failed to save profile information');
+    }
   };
 
   return (

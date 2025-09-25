@@ -1,6 +1,7 @@
 import { GetPlanRequest, GetPlanResponse, APIMeal, Meal } from '../types';
 import { apiRequest, HttpMethod, API_CONFIG } from './apiClient';
 import { MockMealPlanAPI, setMockTestMode, MockTestMode } from './mockMealPlanAPI';
+import { api } from './api';
 
 // Development mode configuration
 const isDevelopmentMode = process.env.NODE_ENV === 'development' || 
@@ -39,10 +40,10 @@ export class MealPlanAPI {
    * @returns Promise<GetPlanResponse> - The meal plan with morning, afternoon, dinner, and alternatives
    */
   static async getPlan(userID: string): Promise<GetPlanResponse> {
-    // Use mock API if userID is null/empty or in development mode
-    if (!userID || isDevelopmentMode) {
-      console.log(`[MealPlanAPI] Using mock API - Development mode: ${isDevelopmentMode}, UserID: ${userID || 'null'}`);
-      return MockMealPlanAPI.getPlan(userID || 'default-user');
+    // Use mock API if userID is null/empty
+    if (!userID) {
+      console.log(`[MealPlanAPI] Using mock API - No UserID provided`);
+      return MockMealPlanAPI.getPlan('default-user');
     }
 
     const requestBody: GetPlanRequest = {
@@ -51,11 +52,9 @@ export class MealPlanAPI {
 
     try {
       console.log(`[MealPlanAPI] Fetching from real API for user: ${userID}`);
-      const response = await apiRequest<GetPlanResponse>(
-        API_CONFIG.ENDPOINTS.GET_PLAN,
-        HttpMethod.POST,
-        requestBody
-      );
+      
+      // Use our new API service that handles authentication
+      const response = await api.post('/GetPlan', requestBody);
 
       // Validate response structure
       if (!response.morn || !response.afternoon || !response.dinner || !Array.isArray(response.Alt)) {

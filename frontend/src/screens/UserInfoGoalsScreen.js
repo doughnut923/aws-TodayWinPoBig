@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,8 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import { useAuth } from '../navigation/AppNavigator';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateProfile } from '../store/slices/authSlice';
 
 const GOALS = [
   {
@@ -34,10 +35,19 @@ const GOALS = [
   },
 ];
 
-export default function UserInfoGoalsScreen({ navigation, route }) {
+export default function UserInfoGoalsScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  
   const [selectedGoal, setSelectedGoal] = useState(null);
-  const { userData } = route.params;
-  const { completeOnboarding } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Pre-populate with existing goal if available
+    if (user && user.goal) {
+      setSelectedGoal(user.goal);
+    }
+  }, [user]);
 
   const handleFinish = async () => {
     if (!selectedGoal) {
@@ -45,24 +55,45 @@ export default function UserInfoGoalsScreen({ navigation, route }) {
       return;
     }
 
-    const completeUserData = {
-      ...userData,
-      goal: selectedGoal,
+    // Update only the goal since other data is already saved via Redux
+    const profileData = {
+      goal: selectedGoal // Use frontend goal ID directly (backend now accepts these values)
     };
 
     try {
-      // In a real app, you would save this data to your backend/database
-      console.log('User Data:', completeUserData);
+      setIsLoading(true);
+      console.log('Saving user goal data:', profileData);
       
-      // Complete the onboarding process
-      completeOnboarding(); // This will navigate to the main app
+      // Save profile data to backend via Redux
+      const resultAction = await dispatch(updateProfile(profileData));
+      
+      if (updateProfile.fulfilled.match(resultAction)) {
+        console.log('Profile updated successfully:', resultAction.payload);
+        // Profile completion will trigger navigation automatically via the RootNavigator
+      } else if (updateProfile.rejected.match(resultAction)) {
+        console.error('Profile update failed:', resultAction.payload);
+        Alert.alert('Error', resultAction.payload || 'Failed to save your information. Please try again.');
+      }
     } catch (error) {
+      console.error('Profile update error:', error);
       Alert.alert('Error', 'Failed to save your information. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleBack = () => {
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      // If this is the first screen, navigate to the logical previous step
+      if (!user?.height || !user?.weight) {
+        navigation.navigate('UserInfoPhysical');
+      } else {
+        // User has physical data, so go to physical screen
+        navigation.navigate('UserInfoPhysical');
+      }
+    }
   };
 
   return (
@@ -127,12 +158,14 @@ export default function UserInfoGoalsScreen({ navigation, route }) {
           <TouchableOpacity
             style={[
               styles.finishButton,
-              !selectedGoal && styles.finishButtonDisabled
+              (!selectedGoal || isLoading) && styles.finishButtonDisabled
             ]}
             onPress={handleFinish}
-            disabled={!selectedGoal}
+            disabled={!selectedGoal || isLoading}
           >
-            <Text style={styles.finishButtonText}>Complete Setup</Text>
+            <Text style={styles.finishButtonText}>
+              {isLoading ? 'Saving...' : 'Complete Setup'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
