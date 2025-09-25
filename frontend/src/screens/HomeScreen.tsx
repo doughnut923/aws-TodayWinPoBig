@@ -11,20 +11,20 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import MealCard from '../components/MealCard';
 import { Meal, HomeScreenProps } from '../types';
-import { useAuth } from '../navigation/AppNavigator';
 import { useMealPlan } from '../hooks';
 
 // Sample meal data - in a real app this would come from an API
 // This is now replaced by the meal plan API data
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const { userData } = useAuth();
+  const { user, isAuthenticated } = useSelector((state: any) => state.auth);
   
-  // Generate userID from userData or use fallback
-  const userID = userData 
-    ? `${userData.firstName}_${userData.lastName}_${userData.age}`.toLowerCase().replace(/\s+/g, '_')
+  // Generate userID from Redux user data
+  const userID = user 
+    ? `${user.firstName}_${user.lastName}_${user.age}`.toLowerCase().replace(/\s+/g, '_')
     : null;
   
   // Use the meal plan API hook
@@ -46,10 +46,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   
   // Fetch meal plan on component mount or when userID changes
   useEffect(() => {
-    if (userID || !userData) { // Fetch even if userID is null (will use mock data)
+    if (userID || !user) { // Fetch even if userID is null (will use mock data)
       fetchMealPlan(userID || 'guest_user');
     }
-  }, [userID, fetchMealPlan, userData]);
+  }, [userID, fetchMealPlan, user]);
   
   // Prepare meals from API data
   const featuredMeals: Meal[] = mealPlanData ? [
@@ -62,10 +62,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   
   // Calculate daily calorie target based on user data
   const calculateDailyCalorieTarget = (): number => {
-    if (!userData) return 2000; // Default fallback
+    if (!user) return 2000; // Default fallback
     
     // Basic calorie calculation using Mifflin-St Jeor Equation
-    const { age, weight, height, unit, goal } = userData;
+    const { age, weight, height, unit, goal } = user;
     
     // Convert to metric if needed
     let weightKg = weight;
@@ -95,7 +95,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
   
   // Get user data with fallbacks
-  const userName: string = userData ? userData.firstName : 'User';
+  const userName: string = user ? user.firstName : 'User';
   const dailyCalorieTarget: number = calculateDailyCalorieTarget();
   const baseCalories: number = 0; // Starting calories for the day
   
@@ -212,9 +212,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Welcome back, {userName}!</Text>
-          {userData && (
+          {user && (
             <Text style={styles.goalText}>
-              Working towards: {formatGoalTitle(userData.goal)}
+              Working towards: {formatGoalTitle(user.goal)}
             </Text>
           )}
         </View>
@@ -223,9 +223,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Animated.View style={[styles.calorieSection, { opacity: progressOpacity }]}>
           <View style={styles.calorieCard}>
             <Text style={styles.calorieTitle}>Daily Calorie Goal</Text>
-            {userData && (
+            {user && (
               <Text style={styles.calorieSubtitle}>
-                {formatGoalDescription(userData.goal)}
+                {formatGoalDescription(user.goal)}
               </Text>
             )}
             <View style={styles.calorieInfo}>

@@ -10,20 +10,16 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { LoginScreenProps } from '../types';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, clearError } from '../store/slices/authSlice';
-import { useAuth } from '../navigation/AppNavigator';
-
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   
-  const dispatch = useAppDispatch();
-  const { isLoading, error, isAuthenticated } = useAppSelector((state) => state.auth);
-  const { login } = useAuth();
+  const dispatch = useDispatch();
+  const { isLoading, error, isAuthenticated } = useSelector((state) => state.auth);
 
-  const validateEmail = (email: string): boolean => {
+  const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
@@ -35,12 +31,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     }
   }, [email, password]);
 
-  // Handle successful authentication
-  useEffect(() => {
-    if (isAuthenticated) {
-      login(); // This will trigger navigation via the auth context
-    }
-  }, [isAuthenticated, login]);
+  // Navigation will happen automatically via RootNavigator based on Redux state
+  // No need to manually trigger navigation
 
   // Show error alert when error occurs
   useEffect(() => {
@@ -49,7 +41,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     }
   }, [error]);
 
-  const handleLogin = async (): Promise<void> => {
+  const handleLogin = async () => {
     if (!email.trim()) {
       Alert.alert('Error', 'Please enter your email address');
       return;
@@ -97,6 +89,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
+                editable={!isLoading}
               />
             </View>
 
@@ -109,11 +102,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 onChangeText={setPassword}
                 secureTextEntry
                 autoCapitalize="none"
+                editable={!isLoading}
               />
             </View>
 
             <TouchableOpacity
-              style={[styles.loginButton, isLoading && styles.disabledButton]}
+              style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
               onPress={handleLogin}
               disabled={isLoading}
             >
@@ -122,19 +116,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.forgotPasswordButton}
-              onPress={() => Alert.alert('Forgot Password', 'Feature coming soon!')}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.signupText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-              <Text style={styles.signupLink}>Sign Up</Text>
-            </TouchableOpacity>
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+                <Text style={styles.signupLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -149,18 +136,19 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    justifyContent: 'center',
   },
   content: {
-    flex: 1,
     padding: 24,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    minHeight: '80%',
   },
   header: {
-    marginTop: 60,
+    alignItems: 'center',
     marginBottom: 40,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#2c3e50',
     marginBottom: 8,
@@ -168,9 +156,10 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#7f8c8d',
+    textAlign: 'center',
   },
   form: {
-    flex: 1,
+    width: '100%',
   },
   inputContainer: {
     marginBottom: 20,
@@ -188,6 +177,14 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
     backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   loginButton: {
     backgroundColor: '#4CAF50',
@@ -195,36 +192,35 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  disabledButton: {
+  loginButtonDisabled: {
     backgroundColor: '#a5d6a7',
-    opacity: 0.6,
   },
   loginButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-  },
-  forgotPasswordButton: {
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  forgotPasswordText: {
-    color: '#4CAF50',
-    fontSize: 14,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 40,
+    marginTop: 32,
   },
-  signupText: {
-    fontSize: 14,
+  footerText: {
+    fontSize: 16,
     color: '#7f8c8d',
   },
   signupLink: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#4CAF50',
     fontWeight: 'bold',
   },

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,23 @@ import {
   Platform,
   SafeAreaView,
 } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProfile } from '../store/slices/authSlice';
 
-export default function UserInfoAgeScreen({ navigation, route }) {
+export default function UserInfoAgeScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  
   const [age, setAge] = useState('');
-  const { userData } = route.params;
 
-  const handleNext = () => {
+  useEffect(() => {
+    // Pre-populate with existing data if available
+    if (user && user.age) {
+      setAge(user.age.toString());
+    }
+  }, [user]);
+
+  const handleNext = async () => {
     const ageNumber = parseInt(age);
     
     if (!age.trim()) {
@@ -28,16 +39,34 @@ export default function UserInfoAgeScreen({ navigation, route }) {
       return;
     }
 
-    navigation.navigate('UserInfoPhysical', {
-      userData: {
-        ...userData,
+    try {
+      // Update user profile with Redux
+      const profileData = {
         age: ageNumber,
+      };
+      
+      console.log('Updating profile with age data:', profileData);
+      const resultAction = await dispatch(updateProfile(profileData));
+      
+      if (updateProfile.fulfilled.match(resultAction)) {
+        navigation.navigate('UserInfoPhysical');
+      } else {
+        Alert.alert('Error', 'Failed to save profile information');
       }
-    });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'Failed to save profile information');
+    }
   };
 
   const handleBack = () => {
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      // If this is the first screen in the stack, navigate to UserInfoName
+      // This handles the case where user starts from Age screen but wants to go back to Name
+      navigation.navigate('UserInfoName');
+    }
   };
 
   return (

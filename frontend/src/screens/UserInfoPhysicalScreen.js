@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,14 +10,27 @@ import {
   Platform,
   SafeAreaView,
 } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProfile } from '../store/slices/authSlice';
 
-export default function UserInfoPhysicalScreen({ navigation, route }) {
+export default function UserInfoPhysicalScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [unit, setUnit] = useState('metric'); // 'metric' or 'imperial'
-  const { userData } = route.params;
 
-  const handleNext = () => {
+  useEffect(() => {
+    // Pre-populate with existing data if available
+    if (user) {
+      setWeight(user.weight ? user.weight.toString() : '');
+      setHeight(user.height ? user.height.toString() : '');
+      setUnit(user.unit || 'metric');
+    }
+  }, [user]);
+
+  const handleNext = async () => {
     const weightNumber = parseFloat(weight);
     const heightNumber = parseFloat(height);
     
@@ -62,18 +75,40 @@ export default function UserInfoPhysicalScreen({ navigation, route }) {
       }
     }
 
-    navigation.navigate('UserInfoGoals', {
-      userData: {
-        ...userData,
+    try {
+      // Update user profile with Redux
+      const profileData = {
         weight: weightNumber,
         height: heightNumber,
         unit: unit,
+      };
+      
+      console.log('Updating profile with physical data:', profileData);
+      const resultAction = await dispatch(updateProfile(profileData));
+      
+      if (updateProfile.fulfilled.match(resultAction)) {
+        navigation.navigate('UserInfoGoals');
+      } else {
+        Alert.alert('Error', 'Failed to save profile information');
       }
-    });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'Failed to save profile information');
+    }
   };
 
   const handleBack = () => {
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      // If this is the first screen, navigate to the logical previous step
+      if (!user?.age) {
+        navigation.navigate('UserInfoAge');
+      } else {
+        // User has age, so go to age screen
+        navigation.navigate('UserInfoAge');
+      }
+    }
   };
 
   return (
