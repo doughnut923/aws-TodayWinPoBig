@@ -19,16 +19,9 @@ Each meal should be selected based on its overall healthiness, nutrient density,
 Return your result in the following format:
 
 ```
-breakfast: (meal code)
-lunch: (meal code)
-dinner: (meal code)
-
-alternatives:
-(meal code) x2
-
-expected calories:
-expected protein:
-expected carbs:
+{
+  "breakfast": "(meal code)", "lunch": "(meal code)", "dinner": "(meal code)", "alternatives": ["(meal code)","(meal code)"],"expected_calories": "","expected_protein": "","expected_carbs": ""
+}
 ```
 
 Ensure that the total expected values are as close as possible to the targets. Prioritize meals with clean ingredients, high fiber, healthy fats, lean proteins, and minimal processed components. Avoid items high in saturated fat, sodium, or added sugars unless necessary for balance.
