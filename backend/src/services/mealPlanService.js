@@ -1,7 +1,9 @@
 
 const { callLLM } = require('./llm');
+const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
+const MealDatabase = require('../models/MealDatabase');
 
 // Read file synchronously
 const basicPrompt = fs.readFileSync('prompt.txt', 'utf8');
@@ -38,8 +40,83 @@ try {
  * @returns {Promise<import('../types/api').GetPlanResponse>}
  */
 async function generateMealPlan(userId) {
-  // Compose a prompt for the LLM using the userId and meal database
-  const prompt = basicPrompt + '/n' + databasePrompt;
+  // Fetch only the required user info from DB
+  let user;
+  try {
+    user = await User.findById(userId, {
+      location: 1,
+      age: 1,
+      height: 1,
+      weight: 1,
+      unit: 1,
+      goal: 1,
+      activityLevel: 1,
+      targetWeight: 1,
+      dietaryRestrictions: 1,
+      preferredCuisines: 1,
+      mealsPerDay: 1
+    }).lean();
+  } catch (e) {
+    throw new Error('User not found');
+  }
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Fetch meal database from MongoDB and filter by user location
+  let filteredRestaurants = [];
+  try {
+    const mealDbDoc = await MealDatabase.findOne({});
+    if (mealDbDoc && Array.isArray(mealDbDoc.restaurants)) {
+      filteredRestaurants = mealDbDoc.restaurants.filter(r => {
+        if (!user.location) return true;
+        return r.location && r.location.toLowerCase() === user.location.toLowerCase();
+      });
+    }
+  } catch (e) {
+    // fallback: filteredRestaurants stays empty
+  }
+
+  // Prepare user info for the prompt
+  const userInfo = `User Info:\n` +
+    `Location: ${user.location || ''}\n` +
+    `Age: ${user.age || ''}\n` +
+    `Height: ${user.height || ''} (${user.unit || 'metric'})\n` +
+    `Weight: ${user.weight || ''} (${user.unit || 'metric'})\n` +
+    `Goal: ${user.goal || ''}\n` +
+    `Activity Level: ${user.activityLevel || ''}\n` +
+    `Target Weight: ${user.targetWeight || ''}\n` +
+    `Dietary Restrictions: ${(user.dietaryRestrictions && user.dietaryRestrictions.length > 0) ? user.dietaryRestrictions.join(', ') : ''}\n` +
+    `Preferred Cuisines: ${(user.preferredCuisines && user.preferredCuisines.length > 0) ? user.preferredCuisines.join(', ') : ''}\n` +
+    `Meals Per Day: ${user.mealsPerDay || ''}\n`;
+
+  // Sort meals by time slots
+  const breakfastMeals = [];
+  const lunchMeals = [];
+  const dinnerMeals = [];
+  filteredRestaurants.forEach(r => {
+    if (Array.isArray(r.items)) {
+      r.items.forEach(item => {
+        if (item.start_time <= 8 && item.end_time >= 11) {
+          breakfastMeals.push({ ...item, restaurant: r.name, location: r.location });
+        } else if (item.start_time <= 11 && item.end_time >= 14) {
+          lunchMeals.push({ ...item, restaurant: r.name, location: r.location });
+        } else if (item.start_time <= 18 && item.end_time >= 21) {
+          dinnerMeals.push({ ...item, restaurant: r.name, location: r.location });
+        }
+      });
+    }
+  });
+
+  // Compose sorted meals into a JSON object
+  const sortedMealsJson = JSON.stringify({
+    breakfast: breakfastMeals,
+    lunch: lunchMeals,
+    dinner: dinnerMeals
+  }, null, 2);
+
+  // Compose a prompt for the LLM using the user info and sorted meals
+  const prompt = basicPrompt + '\n' + userInfo + '\n' + sortedMealsJson;
   let llmResult;
   let llmErrorMessage = '';
   try {
