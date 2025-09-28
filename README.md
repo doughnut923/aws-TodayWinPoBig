@@ -1,5 +1,3 @@
-# Nutri2Go 🥀
-
 AWS AI Hackathon Hong Kong 2025
 
 ---
@@ -20,6 +18,10 @@ In fact, this trend could be supported by data:
 
 Thus the challenge is clear: **how can busy urban professionals enjoy the speed and ease of food delivery while staying aligned with their personal health objectives?**
 
+## Our Goals⛳
+
+Nutri2Go is a mobile food delivery application that combines **convenience with healthy eating** by providing personalized meal recommendations based on users' health goals. Start by providing your health information and goal, and you are all set! Every day, a outdoor delivery meal plan tailor made just for you will be shown on your home screen  
+
 ## **Key Features ✨**
 
 ### **Personalized Nutrition Tracking**
@@ -36,7 +38,7 @@ Thus the challenge is clear: **how can busy urban professionals enjoy the speed
 
 ## Project Structure 🔰
 
-- [Frontend](/frontend/README.md)
+- Frontend
 - Backend
 
 ## Developer Q Adaptation 🤖

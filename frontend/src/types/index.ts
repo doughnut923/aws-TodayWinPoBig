@@ -46,6 +46,7 @@ export interface User {
   height: number;
   unit: 'metric' | 'imperial';
   goal: string;
+  location: string;
 }
 
 export interface UserCalorieData {
@@ -72,6 +73,7 @@ export type UserInfoStackParamList = {
   UserInfoName: undefined;
   UserInfoAge: undefined;
   UserInfoPhysical: undefined;
+  UserInfoLocation: undefined;
   UserInfoGoals: undefined;
 };
 
@@ -153,6 +155,7 @@ export interface AuthContextType {
   userData?: User;
   setUserData: (data: User) => void;
   login: () => void;
+  signupLogin: () => void;
   logout: () => void;
   completeOnboarding: (userData: User) => void;
 }

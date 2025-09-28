@@ -52,7 +52,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // In a real app, you would handle authentication here
-      // The login() call will automatically trigger navigation via the auth context
+      // The login() call will trigger navigation directly to main app (existing users)
       login(); 
     } catch (error) {
       Alert.alert('Error', 'Login failed. Please try again.');
