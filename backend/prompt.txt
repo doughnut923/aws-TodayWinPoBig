@@ -4,15 +4,10 @@ Your task is to:
 
 1. Review all the predicted nutritional values for every menu item across all restaurants.
 2. Identify the healthiest options based on a balanced nutritional profile.
-3. Create a full-day meal plan consisting of:
+3. Unless user specify otherwise, create a full-day meal plan consisting of:
    - One breakfast item
    - One lunch item
    - One dinner item
-
-The target daily intake is:
-- **Total Calories:** ~2000 kcal
-- **Total Protein:** ~80 g
-- **Total Carbs:** ~170 g
 
 Each meal should be selected based on its overall healthiness, nutrient density, and alignment with the target macros.
 
