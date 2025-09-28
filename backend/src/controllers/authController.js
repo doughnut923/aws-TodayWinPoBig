@@ -37,6 +37,7 @@ const register = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        location: user.location,
         age: user.age,
         height: user.height,
         weight: user.weight,
@@ -116,6 +117,7 @@ const login = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        location: user.location,
         age: user.age,
         height: user.height,
         weight: user.weight,
@@ -156,6 +158,7 @@ const getProfile = async (req, res) => {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        location: user.location,
         age: user.age,
         height: user.height,
         weight: user.weight,
@@ -192,7 +195,7 @@ const updateProfile = async (req, res) => {
 
     // Define allowed fields for update
     const allowedFields = [
-      'firstName', 'lastName', 'age', 'height', 'weight', 'unit', 'goal',
+      'firstName', 'lastName', 'location', 'age', 'height', 'weight', 'unit', 'goal',
       'activityLevel', 'targetWeight', 'dietaryRestrictions', 'preferredCuisines', 'mealsPerDay'
     ];
 
@@ -211,6 +214,7 @@ const updateProfile = async (req, res) => {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      location: user.location,
       age: user.age,
       height: user.height,
       weight: user.weight,

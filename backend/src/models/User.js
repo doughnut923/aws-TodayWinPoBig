@@ -32,6 +32,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: [30, 'Last name cannot exceed 30 characters']
   },
+  location: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Location cannot exceed 100 characters']
+  },
   age: {
     type: Number,
     min: [13, 'Age must be at least 13'],
