@@ -3,10 +3,12 @@ Jeremy:
 {
 "restaurant_id": "REST1025",
 "name": "Pasta Palace",
+"location": "TKO",
 "categories": [
 {
-"name": "Appetizers",
-"description": "Delicious Starters 🧀",
+"name": "Breakfast",
+"start_time": 7,
+"end_time": 12,
 "items": [
 {
 "id": "APP101",
@@ -15,6 +17,8 @@ Jeremy:
 "price": 6.99,
 "image": "https://cdn.example.com/garlicbreadsticks.jpg",
 "calories": 280,
+"carbohydrates": 70,
+"protein": 7,
 "is_vegetarian": true,
 "tags": ["cheesy", "crispy"]
 },

@@ -12,7 +12,7 @@ async function postGetPlan(req, res, next) {
       return res.status(400).json({ error: 'Invalid request body', issues: parsed.error.issues });
     }
     const { UserID } = parsed.data;
-    const plan = generateMealPlan(UserID);
+    const plan = await generateMealPlan(UserID);
     return res.json(plan);
   } catch (error) {
     return next(error);
