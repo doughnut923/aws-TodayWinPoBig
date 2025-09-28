@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { useAuth } from '../navigation/AppNavigator';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser } from '../store/slices/authSlice';
 
 const ProfileScreen: React.FC = () => {
-  const { userData, logout } = useAuth();
+  const { user } = useSelector((state: any) => state.auth);
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
     Alert.alert(
@@ -19,12 +21,12 @@ const ProfileScreen: React.FC = () => {
       'Are you sure you want to logout?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: logout },
+        { text: 'Logout', style: 'destructive', onPress: () => dispatch(logoutUser() as any) },
       ]
     );
   };
 
-  if (!userData) {
+  if (!user) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
@@ -61,7 +63,7 @@ const ProfileScreen: React.FC = () => {
     return unit === 'metric' ? `${weight} kg` : `${weight} lbs`;
   };
 
-  const goalInfo = formatGoal(userData.goal);
+  const goalInfo = formatGoal(user.goal);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -76,9 +78,9 @@ const ProfileScreen: React.FC = () => {
         <View style={styles.card}>
           <View style={styles.nameSection}>
             <Text style={styles.nameText}>
-              {userData.firstName} {userData.lastName}
+              {user.firstName} {user.lastName}
             </Text>
-            <Text style={styles.ageText}>{userData.age} years old</Text>
+            <Text style={styles.ageText}>{user.age} years old</Text>
           </View>
         </View>
 
@@ -90,13 +92,13 @@ const ProfileScreen: React.FC = () => {
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>Height</Text>
               <Text style={styles.statValue}>
-                {formatHeight(userData.height, userData.unit)}
+                {formatHeight(user.height, user.unit)}
               </Text>
             </View>
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>Weight</Text>
               <Text style={styles.statValue}>
-                {formatWeight(userData.weight, userData.unit)}
+                {formatWeight(user.weight, user.unit)}
               </Text>
             </View>
           </View>
@@ -105,7 +107,7 @@ const ProfileScreen: React.FC = () => {
             <View style={styles.statItem}>
               <Text style={styles.statLabel}>Unit System</Text>
               <Text style={styles.statValue}>
-                {userData.unit === 'metric' ? 'Metric' : 'Imperial'}
+                {user.unit === 'metric' ? 'Metric' : 'Imperial'}
               </Text>
             </View>
           </View>
