@@ -63,46 +63,73 @@ const validateLogin = [
  * Validation rules for profile update
  */
 const validateProfileUpdate = [
-  body('profile.name')
+  body('firstName')
     .optional()
-    .isLength({ min: 1, max: 50 })
-    .withMessage('Name must be between 1 and 50 characters')
+    .isLength({ min: 1, max: 30 })
+    .withMessage('First name must be between 1 and 30 characters')
     .trim(),
     
-  body('profile.age')
+  body('lastName')
+    .optional()
+    .isLength({ min: 1, max: 30 })
+    .withMessage('Last name must be between 1 and 30 characters')
+    .trim(),
+    
+  body('location')
+    .optional()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Location must be between 1 and 100 characters')
+    .trim(),
+    
+  body('age')
     .optional()
     .isInt({ min: 13, max: 120 })
     .withMessage('Age must be between 13 and 120'),
     
-  body('profile.height')
+  body('height')
     .optional()
     .isFloat({ min: 50, max: 300 })
     .withMessage('Height must be between 50 and 300 cm'),
     
-  body('profile.weight')
+  body('weight')
     .optional()
     .isFloat({ min: 20, max: 500 })
     .withMessage('Weight must be between 20 and 500 kg'),
     
-  body('profile.targetWeight')
+  body('unit')
+    .optional()
+    .isIn(['metric', 'imperial'])
+    .withMessage('Unit must be either metric or imperial'),
+    
+  body('goal')
+    .optional()
+    .isIn(['weight_loss', 'muscle_gain', 'healthy_eating'])
+    .withMessage('Invalid goal'),
+    
+  body('targetWeight')
     .optional()
     .isFloat({ min: 20, max: 500 })
     .withMessage('Target weight must be between 20 and 500 kg'),
     
-  body('profile.activityLevel')
+  body('activityLevel')
     .optional()
     .isIn(['sedentary', 'lightly-active', 'moderately-active', 'very-active', 'extremely-active'])
     .withMessage('Invalid activity level'),
     
-  body('profile.goals')
+  body('dietaryRestrictions')
     .optional()
     .isArray()
-    .withMessage('Goals must be an array'),
+    .withMessage('Dietary restrictions must be an array'),
     
-  body('profile.goals.*')
+  body('preferredCuisines')
     .optional()
-    .isIn(['lose-weight', 'gain-weight', 'maintain-weight', 'build-muscle', 'improve-fitness', 'eat-healthier'])
-    .withMessage('Invalid goal'),
+    .isArray()
+    .withMessage('Preferred cuisines must be an array'),
+    
+  body('mealsPerDay')
+    .optional()
+    .isInt({ min: 1, max: 6 })
+    .withMessage('Meals per day must be between 1 and 6'),
     
   handleValidationErrors
 ];
