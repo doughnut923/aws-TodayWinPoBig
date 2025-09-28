@@ -16,11 +16,11 @@ The target daily intake is:
 
 Each meal should be selected based on its overall healthiness, nutrient density, and alignment with the target macros.
 
-Return your result in the following format:
+Return your result in the following format: (No units)
 
 ```
 {
-  "breakfast": id, "lunch": id, "dinner": id, "alternatives": ["(meal code)","(meal code)"],"expected_calories": "","expected_protein": "","expected_carbs": ""
+  "breakfast": id, "lunch": id, "dinner": id, "alternatives": [id, id],"expected_calories": x,"expected_protein": y,"expected_carbs": z
 }
 ```
 

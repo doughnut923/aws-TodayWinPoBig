@@ -1,87 +1,87 @@
-/** @typedef {import('../types/api')} types */
 
-/** @type {import('../types/api').APIMeal[]} */
-const MOCK_MEALS = [
-  {
-    Name: 'Avocado Toast Bowl',
-    Restaurant: 'Green Kitchen',
-    Calorie: 420,
-    Ingredients: ['avocado', 'whole grain bread', 'cherry tomatoes', 'olive oil', 'sea salt'],
-    Price: 12,
-    Purchase_url: 'https://example.com/order/avocado-toast',
-    Image_url: 'https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=Avocado+Toast',
-  },
-  {
-    Name: 'Grilled Chicken Salad',
-    Restaurant: 'Fresh Bites',
-    Calorie: 380,
-    Ingredients: ['grilled chicken breast', 'mixed greens', 'cucumber', 'bell peppers', 'balsamic vinaigrette'],
-    Price: 15,
-    Purchase_url: 'https://example.com/order/chicken-salad',
-    Image_url: 'https://via.placeholder.com/300x200/FF9800/FFFFFF?text=Chicken+Salad',
-  },
-  {
-    Name: 'Salmon & Quinoa',
-    Restaurant: 'Ocean Grill',
-    Calorie: 520,
-    Ingredients: ['grilled salmon', 'quinoa', 'steamed broccoli', 'lemon', 'herbs'],
-    Price: 22,
-    Purchase_url: 'https://example.com/order/salmon-quinoa',
-    Image_url: 'https://via.placeholder.com/300x200/2196F3/FFFFFF?text=Salmon+Quinoa',
-  },
-  {
-    Name: 'Greek Yogurt Parfait',
-    Restaurant: 'Healthy Corner',
-    Calorie: 280,
-    Ingredients: ['greek yogurt', 'granola', 'fresh berries', 'honey', 'almonds'],
-    Price: 8,
-    Purchase_url: 'https://example.com/order/yogurt-parfait',
-    Image_url: 'https://via.placeholder.com/300x200/9C27B0/FFFFFF?text=Yogurt+Parfait',
-  },
-  {
-    Name: 'Veggie Wrap',
-    Restaurant: 'Green Garden',
-    Calorie: 340,
-    Ingredients: ['whole wheat tortilla', 'hummus', 'cucumber', 'carrots', 'sprouts', 'bell peppers'],
-    Price: 10,
-    Purchase_url: 'https://example.com/order/veggie-wrap',
-    Image_url: 'https://via.placeholder.com/300x200/FF5722/FFFFFF?text=Veggie+Wrap',
-  },
-  {
-    Name: 'Smoothie Bowl',
-    Restaurant: 'Juice Bar',
-    Calorie: 310,
-    Ingredients: ['acai', 'banana', 'berries', 'coconut flakes', 'chia seeds'],
-    Price: 11,
-    Purchase_url: 'https://example.com/order/smoothie-bowl',
-    Image_url: 'https://via.placeholder.com/300x200/E91E63/FFFFFF?text=Smoothie+Bowl',
-  },
-];
+const { callLLM } = require('./llm');
+const fs = require('fs');
+const path = require('path');
 
-function seededShuffle(array, seed) {
-  let currentSeed = seed;
-  const random = () => {
-    currentSeed = (currentSeed * 9301 + 49297) % 233280;
-    return currentSeed / 233280;
-  };
-  return [...array].sort(() => 0.5 - random());
+// Read file synchronously
+const basicPrompt = fs.readFileSync('prompt.txt', 'utf8');
+const databasePrompt = fs.readFileSync('database.json', 'utf8');
+
+// Parse the meal database from databasePrompt (flatten all items from all restaurants)
+let MEAL_DATABASE = [];
+try {
+  const parsed = JSON.parse(databasePrompt);
+  if (parsed && Array.isArray(parsed.restaurants)) {
+    MEAL_DATABASE = parsed.restaurants.flatMap(r =>
+      Array.isArray(r.items)
+        ? r.items.map(item => ({
+            ...item,
+            Restaurant: r.name,
+            RestaurantId: r.restaurant_id,
+            Location: r.location
+          }))
+        : []
+    );
+  } else {
+    MEAL_DATABASE = [];
+  }
+} catch (e) {
+  console.error('Failed to parse database.json:', e);
+  MEAL_DATABASE = [];
 }
+
+
+
 
 /**
  * @param {string} userId
- * @returns {import('../types/api').GetPlanResponse}
+ * @returns {Promise<import('../types/api').GetPlanResponse>}
  */
-function generateMealPlan(userId) {
-  const seed = userId.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0) || 42;
-  const shuffled = seededShuffle(MOCK_MEALS, seed);
-  const alternatives = seededShuffle(MOCK_MEALS, seed + 7).slice(0, Math.min(6, MOCK_MEALS.length));
+async function generateMealPlan(userId) {
+  // Compose a prompt for the LLM using the userId and meal database
+  const prompt = basicPrompt + '/n' + databasePrompt;
+  let llmResult;
+  let llmErrorMessage = '';
+  try {
+    llmResult = await callLLM(prompt);
+  } catch (llmError) {
+    // Capture error message for API response
+    llmErrorMessage = llmError && llmError.message ? llmError.message : 'LLM call failed';
+    llmResult = null;
+  }
 
-  return {
-    morn: shuffled[0] || MOCK_MEALS[0],
-    afternoon: shuffled[1] || MOCK_MEALS[1],
-    dinner: shuffled[2] || MOCK_MEALS[2],
-    Alt: alternatives,
+  // llmResult is already parsed in callLLM, so just use it directly
+  const plan = llmResult || {};
+
+  // Helper to find meal by id (Name, id, or Code)
+  const findMeal = (id) => {
+    if (!id) return undefined;
+    // Try to match by id, name, or code (case-insensitive)
+    return MEAL_DATABASE.find(m =>
+      m.id === id ||
+      m.name === id ||
+      (m.Code && m.Code === id) ||
+      m.Name === id
+    );
   };
+
+  // Defensive: if plan is undefined or missing keys, fallback to first 3 meals in database
+  const fallbackMeals = MEAL_DATABASE.slice(0, 3);
+  const response = {
+    morn: plan && plan.breakfast ? findMeal(plan.breakfast) : fallbackMeals[0],
+    afternoon: plan && plan.lunch ? findMeal(plan.lunch) : fallbackMeals[1],
+    dinner: plan && plan.dinner ? findMeal(plan.dinner) : fallbackMeals[2],
+    Alt: Array.isArray(plan.alternatives)
+      ? plan.alternatives.map(findMeal).filter(Boolean)
+      : fallbackMeals,
+    expected_calories: plan && plan.expected_calories ? plan.expected_calories : '',
+    expected_protein: plan && plan.expected_protein ? plan.expected_protein : '',
+    expected_carbs: plan && plan.expected_carbs ? plan.expected_carbs : ''
+  };
+  if (llmErrorMessage) {
+    response.llm_error = llmErrorMessage;
+  }
+  return response;
 }
 
 module.exports = { generateMealPlan }; 
