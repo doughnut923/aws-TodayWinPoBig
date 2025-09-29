@@ -40,6 +40,30 @@ try {
  * @returns {Promise<import('../types/api').GetPlanResponse>}
  */
 async function generateMealPlan(userId) {
+  // --- MOCK SECTION FOR TESTING FILTERING ---
+  // To test filtering, uncomment the following mock data and comment out the real DB fetch above.
+  // Example: Simulate two restaurants, one matching location 'TKO', one not.
+  /*
+  const filteredRestaurants = [
+    {
+      restaurant_id: 'REST1025',
+      name: 'Pasta Palace',
+      location: 'TKO',
+      items: [
+        { id: 'APP101', name: 'Garlic Breadsticks', start_time: 7, end_time: 12 },
+        { id: 'PASTA001', name: 'Spaghetti Carbonara', start_time: 11, end_time: 22 }
+      ]
+    },
+    {
+      restaurant_id: 'REST9999',
+      name: 'Not In Location',
+      location: 'Other',
+      items: [
+        { id: 'OTHER001', name: 'Other Meal', start_time: 8, end_time: 10 }
+      ]
+    }
+  ];
+  */
   // Fetch only the required user info from DB
   let user;
   try {
@@ -117,6 +141,7 @@ async function generateMealPlan(userId) {
 
   // Compose a prompt for the LLM using the user info and sorted meals
   const prompt = basicPrompt + '\n' + userInfo + '\n' + sortedMealsJson;
+  console.log('Generated Prompt:\n', prompt);
   let llmResult;
   let llmErrorMessage = '';
   try {

@@ -7,8 +7,6 @@ const basicPrompt = fs.readFileSync('prompt.txt', 'utf8');
 const databasePrompt = fs.readFileSync('database.json', 'utf8');
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
-console.log(OPENROUTER_API_KEY);
-
 async function callLLM(text) {
   if (typeof text != 'string') {
     throw new Error("Input must be a string")
