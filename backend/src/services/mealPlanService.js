@@ -7,30 +7,30 @@ const MealDatabase = require('../models/MealDatabase');
 
 // Read file synchronously
 const basicPrompt = fs.readFileSync('prompt.txt', 'utf8');
-const databasePrompt = fs.readFileSync('database.json', 'utf8');
+// const databasePrompt = fs.readFileSync('database.json', 'utf8');
 
-// Parse the meal database from databasePrompt (flatten all items from all restaurants)
-let MEAL_DATABASE = [];
-try {
-  const parsed = JSON.parse(databasePrompt);
-  if (parsed && Array.isArray(parsed.restaurants)) {
-    MEAL_DATABASE = parsed.restaurants.flatMap(r =>
-      Array.isArray(r.items)
-        ? r.items.map(item => ({
-            ...item,
-            Restaurant: r.name,
-            RestaurantId: r.restaurant_id,
-            Location: r.location
-          }))
-        : []
-    );
-  } else {
-    MEAL_DATABASE = [];
-  }
-} catch (e) {
-  console.error('Failed to parse database.json:', e);
-  MEAL_DATABASE = [];
-}
+// // Parse the meal database from databasePrompt (flatten all items from all restaurants)
+// let MEAL_DATABASE = [];
+// try {
+//   const parsed = JSON.parse(databasePrompt);
+//   if (parsed && Array.isArray(parsed.restaurants)) {
+//     MEAL_DATABASE = parsed.restaurants.flatMap(r =>
+//       Array.isArray(r.items)
+//         ? r.items.map(item => ({
+//             ...item,
+//             Restaurant: r.name,
+//             RestaurantId: r.restaurant_id,
+//             Location: r.location
+//           }))
+//         : []
+//     );
+//   } else {
+//     MEAL_DATABASE = [];
+//   }
+// } catch (e) {
+//   console.error('Failed to parse database.json:', e);
+//   MEAL_DATABASE = [];
+// }
 
 
 
@@ -158,31 +158,57 @@ async function generateMealPlan(userId) {
   // llmResult is already parsed in callLLM, so just use it directly
   const plan = llmResult || {};
 
-  // Helper to find meal by id (Name, id, or Code)
+  // Helper to find meal by id (Name, id, or Code) in filteredRestaurants
   const findMeal = (id) => {
     if (!id) return undefined;
-    // Try to match by id, name, or code (case-insensitive)
-    return MEAL_DATABASE.find(m =>
-      m.id === id ||
-      m.name === id ||
-      (m.Code && m.Code === id) ||
-      m.Name === id
-    );
+    const idStr = String(id);
+    for (const r of filteredRestaurants) {
+      if (Array.isArray(r.items)) {
+        const found = r.items.find(m => {
+          // Always compare as string for id
+          return String(m.id) === idStr;
+        });
+        if (found) {
+          return { ...found, Restaurant: r.name, restaurant: r.name };
+        }
+      }
+    }
+    return undefined;
+  };
+
+  // Helper to map a meal object to APIMeal format
+  const mapToAPIMeal = (meal) => {
+    if (!meal) return undefined;
+    return {
+      Name: meal.name || meal.Name || '',
+      Restaurant: meal.Restaurant || meal.restaurant || '',
+      Calorie: meal.calories || meal.Calorie || 0,
+      Ingredients: meal.ingredients || meal.health_tags || [],
+      Price: meal.price || meal.Price || 0,
+      Purchase_url: meal.purchase_url || meal.Purchase_url || '',
+      Image_url: meal.image || meal.Image_url || meal.image_url || '',
+    };
   };
 
   // Defensive: if plan is undefined or missing keys, fallback to first 3 meals in database
-  const fallbackMeals = MEAL_DATABASE.slice(0, 3);
-  const response = {
-    morn: plan && plan.breakfast ? findMeal(plan.breakfast) : fallbackMeals[0],
-    afternoon: plan && plan.lunch ? findMeal(plan.lunch) : fallbackMeals[1],
-    dinner: plan && plan.dinner ? findMeal(plan.dinner) : fallbackMeals[2],
-    Alt: Array.isArray(plan.alternatives)
-      ? plan.alternatives.map(findMeal).filter(Boolean)
-      : fallbackMeals,
-    expected_calories: plan && plan.expected_calories ? plan.expected_calories : '',
-    expected_protein: plan && plan.expected_protein ? plan.expected_protein : '',
-    expected_carbs: plan && plan.expected_carbs ? plan.expected_carbs : ''
+  const emptyMeal = {
+    Name: '',
+    Restaurant: '',
+    Calorie: 0,
+    Ingredients: [],
+    Price: 0,
+    Purchase_url: '',
+    Image_url: ''
   };
+  const response = {
+    morn: mapToAPIMeal(plan && plan.breakfast ? findMeal(plan.breakfast) : null) || emptyMeal,
+    afternoon: mapToAPIMeal(plan && plan.lunch ? findMeal(plan.lunch) : null) || emptyMeal,
+    dinner: mapToAPIMeal(plan && plan.dinner ? findMeal(plan.dinner) : null) || emptyMeal,
+    Alt: Array.isArray(plan.alternatives)
+      ? plan.alternatives.map(findMeal).filter(Boolean).map(mapToAPIMeal)
+      : []
+  };
+  // Optionally, you can still include expected_calories, etc. as extra fields if needed by frontend
   if (llmErrorMessage) {
     response.llm_error = llmErrorMessage;
   }
