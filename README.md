@@ -47,4 +47,3 @@ https://github.com/user-attachments/assets/0e5cebf0-b1ec-4ec5-baf0-2cc2ae254139
 
 - Facilitate code generation tools to significantly **reduce development time**
 - Generated documentation to ensure code readability
-- Assisted deployment on AWS to integrate with **Docker and K8s**
