@@ -1,7 +1,6 @@
 # AWS AI Hackathon Hong Kong 2025
 
 ---
-<img width="100%" alt="banner" src="https://github.com/user-attachments/assets/0397c7f3-d55f-4f1f-ad53-3bfd56cd34ce" />
 
 ## Introduction
 
@@ -23,9 +22,9 @@ Thus the challenge is clear: **how can busy urban professionals enjoy the speed
 
 Nutri2Go is a mobile food delivery application that combines **convenience with healthy eating** by providing personalized meal recommendations based on users' health goals. Start by providing your health information and goal, and you are all set! Every day, a outdoor delivery meal plan tailor made just for you will be shown on your home screen  
 
-## **Key Features ✨**
-
 https://github.com/user-attachments/assets/0e5cebf0-b1ec-4ec5-baf0-2cc2ae254139
+
+## **Key Features ✨**
 
 ### **Personalized Nutrition Tracking**
 
@@ -41,8 +40,8 @@ https://github.com/user-attachments/assets/0e5cebf0-b1ec-4ec5-baf0-2cc2ae254139
 
 ## Project Structure 🔰
 
-- Frontend
-- Backend
+- [Frontend](frontend/README.md)
+- [Backend](backend/README.md)
 
 ## Developer Q Adaptation 🤖
 
