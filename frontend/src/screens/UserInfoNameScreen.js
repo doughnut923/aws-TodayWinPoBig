@@ -72,8 +72,9 @@ export default function UserInfoNameScreen({ navigation }) {
             <View style={styles.progressStep} />
             <View style={styles.progressStep} />
             <View style={styles.progressStep} />
+            <View style={styles.progressStep} />
           </View>
-          <Text style={styles.stepText}>Step 1 of 4</Text>
+          <Text style={styles.stepText}>Step 1 of 5</Text>
         </View>
 
         <View style={styles.content}>
