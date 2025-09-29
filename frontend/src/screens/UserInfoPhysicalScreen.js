@@ -87,7 +87,7 @@ export default function UserInfoPhysicalScreen({ navigation }) {
       const resultAction = await dispatch(updateProfile(profileData));
       
       if (updateProfile.fulfilled.match(resultAction)) {
-        navigation.navigate('UserInfoLocation');
+        navigation.navigate('UserInfoGoals');
       } else {
         Alert.alert('Error', 'Failed to save profile information');
       }

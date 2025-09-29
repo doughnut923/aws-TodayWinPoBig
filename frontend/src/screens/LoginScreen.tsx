@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,43 @@ import {
   ScrollView,
 } from 'react-native';
 import { LoginScreenProps } from '../types';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { loginUser, clearError } from '../store/slices/authSlice';
 import { useAuth } from '../navigation/AppNavigator';
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  
+  const dispatch = useAppDispatch();
+  const { isLoading, error, isAuthenticated } = useAppSelector((state) => state.auth);
   const { login } = useAuth();
 
   const validateEmail = (email: string): boolean => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
   };
+
+  // Clear errors when component unmounts or email/password changes
+  useEffect(() => {
+    if (error) {
+      dispatch(clearError());
+    }
+  }, [email, password]);
+
+  // Handle successful authentication
+  useEffect(() => {
+    if (isAuthenticated) {
+      login(); // This will trigger navigation via the auth context
+    }
+  }, [isAuthenticated, login]);
+
+  // Show error alert when error occurs
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Login Failed', error);
+    }
+  }, [error]);
 
   const handleLogin = async (): Promise<void> => {
     if (!email.trim()) {
@@ -45,20 +70,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In a real app, you would handle authentication here
-      // The login() call will trigger navigation directly to main app (existing users)
-      login(); 
-    } catch (error) {
-      Alert.alert('Error', 'Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Dispatch login action
+    dispatch(loginUser({ email, password }));
   };
 
   return (

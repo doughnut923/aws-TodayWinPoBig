@@ -11,10 +11,10 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useSelector } from 'react-redux';
 import MealCard from '../components/MealCard';
 import { MealPlanLoading } from '../components';
 import { Meal, HomeScreenProps } from '../types';
-import { useSelector } from 'react-redux';
 import { useMealPlan } from '../hooks';
 
 // Sample meal data - in a real app this would come from an API
@@ -104,6 +104,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   
   // Calculate daily calorie target based on user data
   const calculateDailyCalorieTarget = (): number => {
+    if (!user) return 2000; // Default fallback
     if (!user) return 2000; // Default fallback
     
     // Basic calorie calculation using Mifflin-St Jeor Equation
@@ -339,7 +340,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View style={styles.calorieCard}>
             <Text style={styles.calorieTitle}>Daily Calorie Goal</Text>
             {user && (
+            {user && (
               <Text style={styles.calorieSubtitle}>
+                {formatGoalDescription(user.goal)}
                 {formatGoalDescription(user.goal)}
               </Text>
             )}

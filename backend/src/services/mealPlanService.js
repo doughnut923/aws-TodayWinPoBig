@@ -144,18 +144,13 @@ async function generateMealPlan(userId) {
 
   // Compose a prompt for the LLM using the user info and sorted meals
   const prompt = basicPrompt + '\n' + userInfo + '\n' + sortedMealsJson;
-  console.log('[MealPlan] Generated Prompt Length:', prompt.length);
-  console.log('[MealPlan] Available meals - Breakfast:', breakfastMeals.length, 'Lunch:', lunchMeals.length, 'Dinner:', dinnerMeals.length);
-  
+  // console.log('Generated Prompt:\n', prompt);
   let llmResult;
   let llmErrorMessage = '';
   try {
-    console.log('[MealPlan] Calling LLM...');
     llmResult = await callLLM(prompt);
-    console.log('[MealPlan] LLM returned:', llmResult);
   } catch (llmError) {
     // Capture error message for API response
-    console.log('[MealPlan] LLM Error:', llmError.message);
     llmErrorMessage = llmError && llmError.message ? llmError.message : 'LLM call failed';
     llmResult = null;
   }
@@ -166,15 +161,19 @@ async function generateMealPlan(userId) {
   // Helper to find meal by id (Name, id, or Code) in filteredRestaurants
   const findMeal = (id) => {
     if (!id) return undefined;
+    // console.log('Finding meal for id:', id);
     const idStr = String(id);
     for (const r of filteredRestaurants) {
       if (Array.isArray(r.items)) {
         const found = r.items.find(m => {
           // Always compare as string for id
+          // console.log(String(m.id));
           return String(m.id) === idStr;
         });
         if (found) {
-          return { ...found, Restaurant: r.name, restaurant: r.name };
+          // Attach restaurant name as a property for mapping, but do not spread it
+          found._restaurantName = r.name;
+          return found;
         }
       }
     }
@@ -186,7 +185,7 @@ async function generateMealPlan(userId) {
     if (!meal) return undefined;
     return {
       Name: meal.name || meal.Name || '',
-      Restaurant: meal.Restaurant || meal.restaurant || '',
+      Restaurant: meal._restaurantName || '',
       Calorie: meal.calories || meal.Calorie || 0,
       Ingredients: meal.ingredients || meal.health_tags || [],
       Price: meal.price || meal.Price || 0,
@@ -205,44 +204,12 @@ async function generateMealPlan(userId) {
     Purchase_url: '',
     Image_url: ''
   };
-
-  // Better fallback: if LLM fails, pick random meals from available database
-  const getRandomMeal = (meals) => {
-    if (!meals || meals.length === 0) return null;
-    const randomIndex = Math.floor(Math.random() * meals.length);
-    return meals[randomIndex];
-  };
-
-  // If LLM failed, create a fallback plan using database meals
-  let fallbackPlan = null;
-  if (!plan || (!plan.breakfast && !plan.lunch && !plan.dinner)) {
-    console.log('[MealPlan] LLM failed, using database fallback');
-    const randomBreakfast = getRandomMeal(breakfastMeals);
-    const randomLunch = getRandomMeal(lunchMeals);
-    const randomDinner = getRandomMeal(dinnerMeals);
-    
-    console.log('[MealPlan] Selected fallback meals:', {
-      breakfast: randomBreakfast?.id,
-      lunch: randomLunch?.id,
-      dinner: randomDinner?.id
-    });
-    
-    fallbackPlan = {
-      breakfast: randomBreakfast?.id,
-      lunch: randomLunch?.id,
-      dinner: randomDinner?.id
-    };
-  }
-
-  const activePlan = plan || fallbackPlan || {};
-  console.log('[MealPlan] Active plan:', activePlan);
-
   const response = {
-    morn: mapToAPIMeal(activePlan && activePlan.breakfast ? findMeal(activePlan.breakfast) : getRandomMeal(breakfastMeals)) || emptyMeal,
-    afternoon: mapToAPIMeal(activePlan && activePlan.lunch ? findMeal(activePlan.lunch) : getRandomMeal(lunchMeals)) || emptyMeal,
-    dinner: mapToAPIMeal(activePlan && activePlan.dinner ? findMeal(activePlan.dinner) : getRandomMeal(dinnerMeals)) || emptyMeal,
-    Alt: Array.isArray(activePlan.alternatives)
-      ? activePlan.alternatives.map(findMeal).filter(Boolean).map(mapToAPIMeal)
+    morn: mapToAPIMeal(plan && plan.breakfast ? findMeal(plan.breakfast) : null) || emptyMeal,
+    afternoon: mapToAPIMeal(plan && plan.lunch ? findMeal(plan.lunch) : null) || emptyMeal,
+    dinner: mapToAPIMeal(plan && plan.dinner ? findMeal(plan.dinner) : null) || emptyMeal,
+    Alt: Array.isArray(plan.alternatives)
+      ? plan.alternatives.map(findMeal).filter(Boolean).map(mapToAPIMeal)
       : []
   };
   // Optionally, you can still include expected_calories, etc. as extra fields if needed by frontend

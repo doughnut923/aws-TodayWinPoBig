@@ -17,3 +17,4 @@ export default function App(): React.ReactElement {
     </Provider>
   );
 }
+
