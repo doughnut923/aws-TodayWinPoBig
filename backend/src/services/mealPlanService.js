@@ -144,7 +144,7 @@ async function generateMealPlan(userId) {
 
   // Compose a prompt for the LLM using the user info and sorted meals
   const prompt = basicPrompt + '\n' + userInfo + '\n' + sortedMealsJson;
-  console.log('Generated Prompt:\n', prompt);
+  // console.log('Generated Prompt:\n', prompt);
   let llmResult;
   let llmErrorMessage = '';
   try {
@@ -161,15 +161,19 @@ async function generateMealPlan(userId) {
   // Helper to find meal by id (Name, id, or Code) in filteredRestaurants
   const findMeal = (id) => {
     if (!id) return undefined;
+    // console.log('Finding meal for id:', id);
     const idStr = String(id);
     for (const r of filteredRestaurants) {
       if (Array.isArray(r.items)) {
         const found = r.items.find(m => {
           // Always compare as string for id
+          // console.log(String(m.id));
           return String(m.id) === idStr;
         });
         if (found) {
-          return { ...found, Restaurant: r.name, restaurant: r.name };
+          // Attach restaurant name as a property for mapping, but do not spread it
+          found._restaurantName = r.name;
+          return found;
         }
       }
     }
@@ -181,7 +185,7 @@ async function generateMealPlan(userId) {
     if (!meal) return undefined;
     return {
       Name: meal.name || meal.Name || '',
-      Restaurant: meal.Restaurant || meal.restaurant || '',
+      Restaurant: meal._restaurantName || '',
       Calorie: meal.calories || meal.Calorie || 0,
       Ingredients: meal.ingredients || meal.health_tags || [],
       Price: meal.price || meal.Price || 0,
