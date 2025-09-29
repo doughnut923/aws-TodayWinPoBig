@@ -87,12 +87,7 @@ export default function UserInfoGoalsScreen({ navigation }) {
       navigation.goBack();
     } else {
       // If this is the first screen, navigate to the logical previous step
-      if (!user?.height || !user?.weight) {
-        navigation.navigate('UserInfoPhysical');
-      } else {
-        // User has physical data, so go to physical screen
-        navigation.navigate('UserInfoPhysical');
-      }
+      navigation.navigate('UserInfoLocation');
     }
   };
 

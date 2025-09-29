@@ -41,7 +41,7 @@ export class MealPlanAPI {
    */
   static async getPlan(userID: string): Promise<GetPlanResponse> {
     // Use mock API if userID is null/empty
-    console.log("Fetching meal plan for userID:", userID);
+    console.log("[MealPlanAPI] Fetching meal plan for userID:", userID);
     if (!userID) {
       console.log(`[MealPlanAPI] Using mock API - No UserID provided`);
       return MockMealPlanAPI.getPlan('default-user');

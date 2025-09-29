@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,17 +10,33 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProfile } from '../store/slices/authSlice';
 import { HONG_KONG_LOCATIONS, formatLocationDisplay } from '../constants/locations';
 
-export default function UserInfoLocationScreen({ navigation, route }) {
+export default function UserInfoLocationScreen({ navigation }) {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedArea, setSelectedArea] = useState('');
   const [showDistrictModal, setShowDistrictModal] = useState(false);
   const [showAreaModal, setShowAreaModal] = useState(false);
 
-  const userData = route?.params?.userData || {};
+  useEffect(() => {
+    // Pre-populate with existing data if available
+    if (user && user.location) {
+      // Parse existing location to set district and area
+      const locationParts = user.location.split(', ');
+      if (locationParts.length === 2) {
+        const [area, district] = locationParts;
+        setSelectedDistrict(district);
+        setSelectedArea(area);
+      }
+    }
+  }, [user]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!selectedDistrict) {
       Alert.alert('Required', 'Please select a district');
       return;
@@ -31,18 +47,35 @@ export default function UserInfoLocationScreen({ navigation, route }) {
       return;
     }
 
-    const formattedLocation = formatLocationDisplay(selectedDistrict, selectedArea);
-    
-    navigation.navigate('UserInfoGoals', {
-      userData: {
-        ...userData,
+    try {
+      const formattedLocation = formatLocationDisplay(selectedDistrict, selectedArea);
+      
+      // Update user profile with Redux
+      const profileData = {
         location: formattedLocation,
+      };
+      
+      console.log('Updating profile with location data:', profileData);
+      const resultAction = await dispatch(updateProfile(profileData));
+      
+      if (updateProfile.fulfilled.match(resultAction)) {
+        navigation.navigate('UserInfoGoals');
+      } else {
+        Alert.alert('Error', 'Failed to save profile information');
       }
-    });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'Failed to save profile information');
+    }
   };
 
   const handleBack = () => {
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      // If this is the first screen, navigate to the logical previous step
+      navigation.navigate('UserInfoPhysical');
+    }
   };
 
   const handleDistrictSelect = (district) => {
