@@ -41,6 +41,7 @@ export class MealPlanAPI {
    */
   static async getPlan(userID: string): Promise<GetPlanResponse> {
     // Use mock API if userID is null/empty
+    console.log("Fetching meal plan for userID:", userID);
     if (!userID) {
       console.log(`[MealPlanAPI] Using mock API - No UserID provided`);
       return MockMealPlanAPI.getPlan('default-user');
@@ -55,6 +56,9 @@ export class MealPlanAPI {
       
       // Use our new API service that handles authentication
       const response = await api.post('/GetPlan', requestBody);
+      
+      // Debug: Log the raw API response
+      console.log('[MealPlanAPI] Raw API response:', JSON.stringify(response, null, 2));
 
       // Validate response structure
       if (!response.morn || !response.afternoon || !response.dinner || !Array.isArray(response.Alt)) {
@@ -63,8 +67,14 @@ export class MealPlanAPI {
 
       return response;
     } catch (error: any) {
+      // Check if it's an authentication error
+      if (error.response?.status === 401) {
+        console.error('[MealPlanAPI] Authentication error - token expired or invalid');
+        throw new Error('Authentication required');
+      }
+      
       console.error('Error fetching meal plan from real API, falling back to mock:', error);
-      // Fallback to mock API if real API fails
+      // Fallback to mock API only for non-auth errors
       return MockMealPlanAPI.getPlan(userID);
     }
   }

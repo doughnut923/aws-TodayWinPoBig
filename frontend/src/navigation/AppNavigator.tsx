@@ -14,9 +14,9 @@ import SignupScreen from '../screens/SignupScreenRedux';
 import UserInfoNameScreen from '../screens/UserInfoNameScreen';
 import UserInfoAgeScreen from '../screens/UserInfoAgeScreen';
 import UserInfoPhysicalScreen from '../screens/UserInfoPhysicalScreen';
-import UserInfoLocationScreen from '../screens/UserInfoLocationScreen';
 import UserInfoGoalsScreen from '../screens/UserInfoGoalsScreen';
-import { RootStackParamList, TabParamList, AuthContextType, UserInfoStackParamList, AuthStackParamList, User } from '../types';
+import UserInfoLocationScreen from '../screens/UserInfoLocationScreen';
+import { RootStackParamList, TabParamList, AuthContextType, UserInfoStackParamList, AuthStackParamList, User} from '../types';
 
 // Create Auth Context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -126,8 +126,8 @@ function UserInfoStack() {
       <UserInfoStackNavigator.Screen name="UserInfoName" component={UserInfoNameScreen} />
       <UserInfoStackNavigator.Screen name="UserInfoAge" component={UserInfoAgeScreen} />
       <UserInfoStackNavigator.Screen name="UserInfoPhysical" component={UserInfoPhysicalScreen} />
-      <UserInfoStackNavigator.Screen name="UserInfoLocation" component={UserInfoLocationScreen} />
       <UserInfoStackNavigator.Screen name="UserInfoGoals" component={UserInfoGoalsScreen} />
+      <UserInfoStackNavigator.Screen name="UserInfoLocation" component={UserInfoLocationScreen} />
     </UserInfoStackNavigator.Navigator>
   );
 }
@@ -199,12 +199,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = (): void => {
     setIsLoggedIn(true);
-    setHasCompletedOnboarding(true); // Existing users skip onboarding
-  };
-
-  const signupLogin = (): void => {
-    setIsLoggedIn(true);
-    setHasCompletedOnboarding(false); // New users go through onboarding
   };
 
   const logout = (): void => {
@@ -229,7 +223,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     userData,
     setUserData,
     login,
-    signupLogin,
     logout,
     completeOnboarding,
   };

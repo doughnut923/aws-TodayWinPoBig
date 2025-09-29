@@ -144,13 +144,18 @@ async function generateMealPlan(userId) {
 
   // Compose a prompt for the LLM using the user info and sorted meals
   const prompt = basicPrompt + '\n' + userInfo + '\n' + sortedMealsJson;
-  console.log('Generated Prompt:\n', prompt);
+  console.log('[MealPlan] Generated Prompt Length:', prompt.length);
+  console.log('[MealPlan] Available meals - Breakfast:', breakfastMeals.length, 'Lunch:', lunchMeals.length, 'Dinner:', dinnerMeals.length);
+  
   let llmResult;
   let llmErrorMessage = '';
   try {
+    console.log('[MealPlan] Calling LLM...');
     llmResult = await callLLM(prompt);
+    console.log('[MealPlan] LLM returned:', llmResult);
   } catch (llmError) {
     // Capture error message for API response
+    console.log('[MealPlan] LLM Error:', llmError.message);
     llmErrorMessage = llmError && llmError.message ? llmError.message : 'LLM call failed';
     llmResult = null;
   }
@@ -200,12 +205,44 @@ async function generateMealPlan(userId) {
     Purchase_url: '',
     Image_url: ''
   };
+
+  // Better fallback: if LLM fails, pick random meals from available database
+  const getRandomMeal = (meals) => {
+    if (!meals || meals.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * meals.length);
+    return meals[randomIndex];
+  };
+
+  // If LLM failed, create a fallback plan using database meals
+  let fallbackPlan = null;
+  if (!plan || (!plan.breakfast && !plan.lunch && !plan.dinner)) {
+    console.log('[MealPlan] LLM failed, using database fallback');
+    const randomBreakfast = getRandomMeal(breakfastMeals);
+    const randomLunch = getRandomMeal(lunchMeals);
+    const randomDinner = getRandomMeal(dinnerMeals);
+    
+    console.log('[MealPlan] Selected fallback meals:', {
+      breakfast: randomBreakfast?.id,
+      lunch: randomLunch?.id,
+      dinner: randomDinner?.id
+    });
+    
+    fallbackPlan = {
+      breakfast: randomBreakfast?.id,
+      lunch: randomLunch?.id,
+      dinner: randomDinner?.id
+    };
+  }
+
+  const activePlan = plan || fallbackPlan || {};
+  console.log('[MealPlan] Active plan:', activePlan);
+
   const response = {
-    morn: mapToAPIMeal(plan && plan.breakfast ? findMeal(plan.breakfast) : null) || emptyMeal,
-    afternoon: mapToAPIMeal(plan && plan.lunch ? findMeal(plan.lunch) : null) || emptyMeal,
-    dinner: mapToAPIMeal(plan && plan.dinner ? findMeal(plan.dinner) : null) || emptyMeal,
-    Alt: Array.isArray(plan.alternatives)
-      ? plan.alternatives.map(findMeal).filter(Boolean).map(mapToAPIMeal)
+    morn: mapToAPIMeal(activePlan && activePlan.breakfast ? findMeal(activePlan.breakfast) : getRandomMeal(breakfastMeals)) || emptyMeal,
+    afternoon: mapToAPIMeal(activePlan && activePlan.lunch ? findMeal(activePlan.lunch) : getRandomMeal(lunchMeals)) || emptyMeal,
+    dinner: mapToAPIMeal(activePlan && activePlan.dinner ? findMeal(activePlan.dinner) : getRandomMeal(dinnerMeals)) || emptyMeal,
+    Alt: Array.isArray(activePlan.alternatives)
+      ? activePlan.alternatives.map(findMeal).filter(Boolean).map(mapToAPIMeal)
       : []
   };
   // Optionally, you can still include expected_calories, etc. as extra fields if needed by frontend

@@ -7,7 +7,7 @@ const API_BASE_URL = 'http://localhost:3000/api';
 // Create axios instance
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 0,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,8 +18,13 @@ apiClient.interceptors.request.use(
   async (config) => {
     try {
       const token = await AsyncStorage.getItem('token');
+      console.log('[API] Request interceptor - token found:', !!token);
+      console.log('[API] Request URL:', config.url);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('[API] Added Authorization header');
+      } else {
+        console.log('[API] No token found in AsyncStorage');
       }
     } catch (error) {
       console.error('Error getting token from storage:', error);

@@ -14,19 +14,20 @@ import {
 import MealCard from '../components/MealCard';
 import { MealPlanLoading } from '../components';
 import { Meal, HomeScreenProps } from '../types';
-import { useAuth } from '../navigation/AppNavigator';
+import { useSelector } from 'react-redux';
 import { useMealPlan } from '../hooks';
 
 // Sample meal data - in a real app this would come from an API
 // This is now replaced by the meal plan API data
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const { userData } = useAuth();
+  // Use Redux for user data instead of Context API
+  const { user, isAuthenticated } = useSelector((state: any) => state.auth);
   
-  // Generate userID from userData or use fallback
-  const userID = userData 
-    ? `${userData.firstName}_${userData.lastName}_${userData.age}`.toLowerCase().replace(/\s+/g, '_')
-    : null;
+  // Use the actual user ID from Redux authentication state
+  const userID = user?._id || null;
+  
+  console.log('[HomeScreen] Auth state:', { isAuthenticated, hasUser: !!user, userID });
   
   // Use the meal plan API hook
   const { 
@@ -62,23 +63,35 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       await fetchMealPlanWithRetry(id, handleRetryCallback);
       setIsRetryMode(false);
       setRetryAttempt(0);
-    } catch (error) {
+    } catch (error: any) {
+      console.error('[HomeScreen] Meal plan fetch failed:', error);
       setIsRetryMode(false);
       setRetryAttempt(0);
-      // Error is already handled by the useMealPlan hook
+      
+      // If it's an authentication error, don't retry
+      if (error.message?.includes('Authentication required')) {
+        console.log('[HomeScreen] Authentication error detected, stopping retry');
+        return;
+      }
     }
   };
   
   // Fetch meal plan on component mount or when userID changes
   useEffect(() => {
-    if (userID || !userData) { // Fetch even if userID is null (will use mock data)
-      // First try regular fetch, if it returns empty, switch to retry mode
-      fetchMealPlan(userID || 'guest_user').then(() => {
+    // Only fetch meal plan if user is authenticated and has a valid userID
+    if (isAuthenticated && userID) {
+      console.log('[HomeScreen] Fetching meal plan for authenticated user:', userID);
+      fetchMealPlan(userID).then(() => {
         // Check if the meal plan is empty and needs retry
         // This will be handled by the component rendering logic
       });
+    } else {
+      console.log('[HomeScreen] Skipping meal plan fetch - not authenticated or no userID', {
+        isAuthenticated,
+        userID
+      });
     }
-  }, [userID, fetchMealPlan, userData]);
+  }, [userID, fetchMealPlan, isAuthenticated]);
   
   // Prepare meals from API data
   const featuredMeals: Meal[] = mealPlanData ? [
@@ -91,10 +104,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   
   // Calculate daily calorie target based on user data
   const calculateDailyCalorieTarget = (): number => {
-    if (!userData) return 2000; // Default fallback
+    if (!user) return 2000; // Default fallback
     
     // Basic calorie calculation using Mifflin-St Jeor Equation
-    const { age, weight, height, unit, goal } = userData;
+    const { age, weight, height, unit, goal } = user;
     
     // Convert to metric if needed
     let weightKg = weight;
@@ -124,7 +137,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
   
   // Get user data with fallbacks
-  const userName: string = userData ? userData.firstName : 'User';
+  const userName: string = user ? user.firstName : 'User';
   const dailyCalorieTarget: number = calculateDailyCalorieTarget();
   const baseCalories: number = 0; // Starting calories for the day
   
@@ -252,20 +265,59 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   // Auto-trigger retry mode if meal plan is empty
   useEffect(() => {
-    if (mealPlanData && isMealPlanEmpty() && !isRetryMode && !mealPlanLoading) {
+    if (isAuthenticated && userID && mealPlanData && isMealPlanEmpty() && !isRetryMode && !mealPlanLoading) {
       console.log('[HomeScreen] Detected empty meal plan, switching to retry mode');
-      const currentUserID = userID || 'guest_user';
-      fetchMealPlanWithRetryLogic(currentUserID);
+      fetchMealPlanWithRetryLogic(userID);
     }
-  }, [mealPlanData, isRetryMode, mealPlanLoading, userID]);
+  }, [mealPlanData, isRetryMode, mealPlanLoading, userID, isAuthenticated]);
 
   // Show loading screen if in retry mode or if initial loading with no data
-  if (isRetryMode || (mealPlanLoading && !mealPlanData)) {
+  // Show loading screen if in retry mode or if initial loading with no data
+  // But not if there's an authentication error
+  if ((isRetryMode || (mealPlanLoading && !mealPlanData)) && !mealPlanError?.includes('Authentication required')) {
     return (
       <MealPlanLoading 
         attempt={retryAttempt} 
         message={isRetryMode ? "Tailoring a meal plan for you" : "Loading your meal plan"}
       />
+    );
+  }
+
+  // Show message if user is not authenticated (this shouldn't happen due to RootNavigator, but just in case)
+  if (!isAuthenticated) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+          <Text style={styles.welcomeText}>Authentication Required</Text>
+          <Text style={[styles.goalText, { textAlign: 'center', marginTop: 10 }]}>
+            Please log in to view your personalized meal plan
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Show authentication error if meal plan API returned auth error
+  if (mealPlanError?.includes('Authentication required')) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+          <Text style={styles.welcomeText}>Session Expired</Text>
+          <Text style={[styles.goalText, { textAlign: 'center', marginTop: 10 }]}>
+            Your session has expired. Please log in again to continue.
+          </Text>
+          <TouchableOpacity 
+            style={[styles.retryButton, { marginTop: 20, padding: 15, backgroundColor: '#4CAF50', borderRadius: 8 }]}
+            onPress={() => {
+              // Clear error and navigate back to login
+              console.log('[HomeScreen] Authentication error - should navigate to login');
+              // Note: Navigation should be handled by RootNavigator when auth state changes
+            }}
+          >
+            <Text style={[styles.retryText, { color: 'white', fontSize: 16 }]}>Go to Login</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -275,9 +327,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Welcome back, {userName}!</Text>
-          {userData && (
+          {user && (
             <Text style={styles.goalText}>
-              Working towards: {formatGoalTitle(userData.goal)}
+              Working towards: {formatGoalTitle(user.goal)}
             </Text>
           )}
         </View>
@@ -286,9 +338,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Animated.View style={[styles.calorieSection, { opacity: progressOpacity }]}>
           <View style={styles.calorieCard}>
             <Text style={styles.calorieTitle}>Daily Calorie Goal</Text>
-            {userData && (
+            {user && (
               <Text style={styles.calorieSubtitle}>
-                {formatGoalDescription(userData.goal)}
+                {formatGoalDescription(user.goal)}
               </Text>
             )}
             <View style={styles.calorieInfo}>

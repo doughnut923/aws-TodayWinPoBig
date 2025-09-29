@@ -81,6 +81,44 @@ const auth = async (req, res, next) => {
 };
 
 /**
+ * Optional authentication middleware - adds user info if token is present, but doesn't require it
+ */
+const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.header('Authorization');
+    
+    // If no auth header, continue without user info
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      req.user = null;
+      return next();
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    
+    try {
+      const decoded = jwt.verify(token, env.jwtSecret);
+      const user = await User.findById(decoded.userId).select('-password');
+      
+      if (!user) {
+        req.user = null;
+        return next();
+      }
+      
+      req.user = user;
+      next();
+    } catch (jwtError) {
+      // Invalid token, continue without user info
+      req.user = null;
+      next();
+    }
+  } catch (error) {
+    // Any error, continue without user info
+    req.user = null;
+    next();
+  }
+};
+
+/**
  * Generate JWT token for user
  */
 const generateToken = (userId) => {
@@ -97,5 +135,6 @@ const generateToken = (userId) => {
 
 module.exports = {
   auth,
+  optionalAuth,
   generateToken
 };
