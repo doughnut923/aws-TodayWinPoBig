@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const MealDatabase = require('../src/models/MealDatabase');
 const dbUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/yourDatabaseName';
 
-async function updateAllRestaurantLocations() {
+const NEW_IMAGE_URL = 'https://img.freepik.com/free-psd/roasted-chicken-dinner-platter-delicious-feast_632498-25445.jpg';
+
+async function updateAllMealImages() {
   try {
     await mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log('Connected to MongoDB');
@@ -13,17 +15,23 @@ async function updateAllRestaurantLocations() {
       console.log('No restaurants found in MealDatabase.');
       return;
     }
+    let mealCount = 0;
     mealDbDoc.restaurants.forEach(r => {
-      r.image = 'https://img.freepik.com/free-psd/roasted-chicken-dinner-platter-delicious-feast_632498-25445.jpg';
+      if (Array.isArray(r.items)) {
+        r.items.forEach(item => {
+          item.image = NEW_IMAGE_URL;
+          mealCount++;
+        });
+      }
     });
     await mealDbDoc.save();
-    console.log(`Updated location to 'TKO' for all ${mealDbDoc.restaurants.length} restaurants.`);
+    console.log(`Updated image for ${mealCount} meals in all restaurants.`);
   } catch (err) {
-    console.error('Error updating restaurant locations:', err);
+    console.error('Error updating meal images:', err);
   } finally {
     await mongoose.disconnect();
     process.exit();
   }
 }
 
-updateAllRestaurantLocations();
+updateAllMealImages();

@@ -36,6 +36,7 @@ export interface GetPlanResponse {
   afternoon: APIMeal;
   dinner: APIMeal;
   Alt: APIMeal[];
+  expected_calories: number;
 }
 
 export interface User {

@@ -139,7 +139,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   
   // Get user data with fallbacks
   const userName: string = user ? user.firstName : 'User';
-  const dailyCalorieTarget: number = calculateDailyCalorieTarget();
+  const dailyCalorieTarget: number = mealPlanData?.expected_calories ?? calculateDailyCalorieTarget();
   const baseCalories: number = 0; // Starting calories for the day
   
   // Calculate current calories from checked meals

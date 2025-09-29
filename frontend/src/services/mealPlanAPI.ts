@@ -173,6 +173,7 @@ export class MealPlanAPI {
       alternatives: apiResponse.Alt.map(meal => 
         this.convertAPIMealToMeal(meal, idCounter++, 'Alternative')
       ),
+      expected_calories: apiResponse.expected_calories || 0,
     };
   }
 

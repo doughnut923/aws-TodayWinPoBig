@@ -65,6 +65,7 @@ async function generateMealPlan(userId) {
   ];
   */
   // Fetch only the required user info from DB
+  console.log('Received meal plan request from userId:', userId);
   let user;
   try {
     user = await User.findById(userId, {
@@ -97,13 +98,13 @@ async function generateMealPlan(userId) {
         return r.location && r.location.toLowerCase() === user.location.toLowerCase();
       });
     }
+    console.log(`Filtered restaurants count: ${filteredRestaurants.length}`);
   } catch (e) {
     // fallback: filteredRestaurants stays empty
   }
 
   // Prepare user info for the prompt
   const userInfo = `User Info:\n` +
-    `Location: ${user.location || ''}\n` +
     `Age: ${user.age || ''}\n` +
     `Height: ${user.height || ''} (${user.unit || 'metric'})\n` +
     `Weight: ${user.weight || ''} (${user.unit || 'metric'})\n` +
@@ -123,12 +124,15 @@ async function generateMealPlan(userId) {
       r.items.forEach(item => {
         // A meal can be in multiple slots if its time overlaps
         if (item.start_time <= 8 && item.end_time >= 11) {
+          // console.log('Breakfast meal found:', item.id);
           breakfastMeals.push({ ...item, restaurant: r.name, location: r.location });
         }
         if (item.start_time <= 11 && item.end_time >= 14) {
+          // console.log('Lunch meal found:', item.id);
           lunchMeals.push({ ...item, restaurant: r.name, location: r.location });
         }
         if (item.start_time <= 18 && item.end_time >= 21) {
+          // console.log('Dinner meal found:', item.id);
           dinnerMeals.push({ ...item, restaurant: r.name, location: r.location });
         }
       });
@@ -210,7 +214,8 @@ async function generateMealPlan(userId) {
     dinner: mapToAPIMeal(plan && plan.dinner ? findMeal(plan.dinner) : null) || emptyMeal,
     Alt: Array.isArray(plan.alternatives)
       ? plan.alternatives.map(findMeal).filter(Boolean).map(mapToAPIMeal)
-      : []
+      : [],
+    expected_calories: parseInt(plan.expected_calories, 10) || 0
   };
   // Optionally, you can still include expected_calories, etc. as extra fields if needed by frontend
   if (llmErrorMessage) {
