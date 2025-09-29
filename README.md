@@ -1,6 +1,7 @@
 # AWS AI Hackathon Hong Kong 2025
 
 ---
+<img width="100%" alt="banner" src="https://github.com/user-attachments/assets/29f6ace3-ca1d-455e-a7cf-5e11547019c0" />
 
 ## Introduction
 
