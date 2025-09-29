@@ -49,8 +49,8 @@ const MealInfoScreen: React.FC<MealInfoScreenProps> = ({ navigation, route }) =>
   const nutritionalTags = getNutritionalTags(meal);
 
   const handleOrder = (): void => {
-    if (meal.purchase_url) {
-      Linking.openURL(meal.purchase_url).catch((err) => {
+    if (true) {
+      Linking.openURL('https://jp.openrice.com/ja/tokyo-kanto').catch((err) => {
         console.error('Failed to open URL:', err);
         Alert.alert('Error', 'Could not open purchase link');
       });
@@ -64,6 +64,7 @@ const MealInfoScreen: React.FC<MealInfoScreenProps> = ({ navigation, route }) =>
             onPress: () => {
               // In a real app, navigate to orders screen
               Alert.alert('Coming Soon', 'Orders screen will be available soon!');
+              
             },
           },
           {

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { GetPlanResponse } from '../types';
 import { MealPlanAPI } from '../services/mealPlanAPI';
 
@@ -31,11 +31,25 @@ export const useMealPlan = (userID?: string): UseMealPlanReturn => {
   });
 
   const [lastUserID, setLastUserID] = useState<string>('');
+  
+  // Ref to track if a request is already in progress to prevent multiple simultaneous calls
+  const isRequestInProgress = useRef<boolean>(false);
+  const currentRequestUserID = useRef<string>('');
 
   /**
    * Regular meal plan fetch
    */
   const fetchMealPlan = useCallback(async (id: string) => {
+    // Prevent multiple simultaneous API calls for the same user
+    if (isRequestInProgress.current && currentRequestUserID.current === id) {
+      console.log('[useMealPlan] Request already in progress for user:', id, 'skipping duplicate call');
+      return;
+    }
+
+    // Mark request as in progress
+    isRequestInProgress.current = true;
+    currentRequestUserID.current = id;
+
     setState(prev => ({ ...prev, loading: true, error: null }));
     setLastUserID(id);
 
@@ -55,6 +69,10 @@ export const useMealPlan = (userID?: string): UseMealPlanReturn => {
         loading: false,
         error: err.message || 'Failed to fetch meal plan',
       }));
+    } finally {
+      // Mark request as completed
+      isRequestInProgress.current = false;
+      currentRequestUserID.current = '';
     }
   }, []);
 
@@ -65,6 +83,16 @@ export const useMealPlan = (userID?: string): UseMealPlanReturn => {
     id: string, 
     onRetry?: (attempt: number) => void
   ) => {
+    // Prevent multiple simultaneous API calls for the same user
+    if (isRequestInProgress.current && currentRequestUserID.current === id) {
+      console.log('[useMealPlan] Retry request already in progress for user:', id, 'skipping duplicate call');
+      return;
+    }
+
+    // Mark request as in progress
+    isRequestInProgress.current = true;
+    currentRequestUserID.current = id;
+
     setState(prev => ({ ...prev, loading: true, error: null }));
     setLastUserID(id);
 
@@ -84,6 +112,10 @@ export const useMealPlan = (userID?: string): UseMealPlanReturn => {
         loading: false,
         error: err.message || 'Failed to fetch meal plan after multiple attempts',
       }));
+    } finally {
+      // Mark request as completed
+      isRequestInProgress.current = false;
+      currentRequestUserID.current = '';
     }
   }, []);
 
