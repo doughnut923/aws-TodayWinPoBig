@@ -1,54 +1,189 @@
-# Hackathon Backend (Demo) — Node.js + Express (JS)
 
-Minimal Express backend in plain JavaScript that matches the frontend API contract.
 
-## Run
+# 🍽️ Nutri2Go Backend — Node.js + Express API
 
-1. In `backend/` install deps:
-   
+An advanced, production-ready backend for the TodayWinPoBig app. Built with Node.js, Express, and MongoDB, it features secure authentication, a rich user profile system, real database integration, and AI-powered meal planning via LLMs. Designed for seamless integration with the React Native frontend and scalable for real-world deployment.
+
+---
+
+
+## 🌟 Key Features & Strengths
+
+- **Real Database Integration**: Uses MongoDB (via Mongoose) for persistent, scalable storage of users, meals, and restaurants. All user and meal data is stored and queried in a real database, not just in-memory or mock data.
+- **Rich User Profile System**: Supports full user onboarding, profile editing, dietary preferences, goals, activity level, and more. Profiles are validated, updatable, and used for personalized recommendations.
+- **AI-Powered Meal Planning (LLM Integration)**: Integrates with OpenRouter LLMs to generate meal plans tailored to each user’s real profile and local restaurant data. The LLM receives structured user and meal data for context-aware, dynamic recommendations.
+- **Secure Authentication**: Email/password registration and login, JWT-based sessions, password hashing, and account status checks. Includes profile completeness tracking and virtual fields (BMI, completion %).
+- **Comprehensive REST API**: Predictable, well-documented endpoints for authentication, user profile, and meal planning. All endpoints use strong runtime validation (`zod`).
+- **Production-Ready Middleware**: Includes CORS, rate limiting, helmet, and centralized error handling for robust security and reliability.
+- **Environment-Driven Config**: All secrets, DB URIs, and settings are managed via `.env` for safe deployment.
+- **Extensible & Maintainable**: Modular codebase with clear separation of concerns (controllers, services, models, middleware).
+
+---
+
+## 🏗️ Project Structure
+
+```
+backend/
+├── src/
+│   ├── config/           # Environment config
+│   ├── controllers/      # Route controllers (auth, meal plan)
+│   ├── middleware/       # Auth, validation, error handling
+│   ├── models/           # User and meal data models (MongoDB)
+│   ├── routes/           # API route definitions
+│   ├── services/         # Business logic (meal plan, LLM)
+│   ├── types/            # API type definitions (JSDoc)
+│   └── index.js          # App entry point
+├── tests/                # Utility and integration scripts
+├── .env                  # Environment variables
+├── package.json          # Dependencies and scripts
+└── README.md             # Project documentation
+```
+
+---
+
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js**: v16 or newer
+- **npm**: v8 or newer
+
+### Installation
+
+1. **Install dependencies**
    ```bash
    npm install
    ```
-2. Start dev server (auto-reload):
-   
+2. **Configure environment**
+   - Copy `.env.example` to `.env` and edit as needed
+3. **Start the server (dev mode)**
    ```bash
    npm run dev
    ```
-3. Or start normally:
-   
+   Or start normally:
    ```bash
    npm start
    ```
-4. Server listens on `http://localhost:3001` (configurable via `PORT`).
-5. Health check: `GET /api/health`
-6. Meal plan: `POST /api/GetPlan` with body `{ "UserID": "user123" }`.
+4. **Server runs at**: `http://localhost:3001` (default, configurable via `PORT`)
 
-## File Descriptions
+---
 
-- `src/index.js`: Express bootstrap, middleware, routes, 404 and error handling.
-- `src/config/env.js`: Environment variables with safe defaults (port, CORS origin).
-- `src/types/api.js`: JSDoc typedefs for API shapes (`APIMeal`, `GetPlanRequest`, `GetPlanResponse`).
-- `src/services/mealPlanService.js`: Mock generator that creates a deterministic plan from a `UserID`.
-- `src/controllers/mealPlanController.js`: Validates input and returns the plan.
-- `src/routes/index.js`: Router that defines `POST /GetPlan`.
-- `src/middleware/errorHandler.js`: Centralized error handler.
+---
 
-## API Contract
 
-- Endpoint: `POST /api/GetPlan`
-- Request: `{ "UserID": string }`
-- Response:
-  ```json
-  {
-    "morn": { "Name": "...", "Restaurant": "...", "Calorie": 0, "Ingredients": [], "Price": 0, "Purchase_url": "...", "Image_url": "..." },
-    "afternoon": { /* APIMeal */ },
-    "dinner": { /* APIMeal */ },
-    "Alt": [ /* APIMeal[] */ ]
-  }
-  ```
+## 🔌 API Endpoints (Highlights)
 
-## Notes
+### Health Check
+- `GET /api/health` → `{ status: "ok" }`
 
-- CORS is permissive for demo (`*`). Tighten for production.
-- No database; all data is in-memory mock suitable for a hackathon demo.
-- Input validation uses `zod`. Errors return 400 with issues. 
+
+### User Authentication & Profile
+- `POST /api/auth/register` — Register a new user (email, password, profile fields)
+- `POST /api/auth/login` — Login and receive JWT
+- `GET /api/auth/profile` — Get current user profile (requires JWT)
+- `PUT /api/auth/profile` — Update user profile (diet, goals, etc.)
+
+### Meal Plan (AI-Driven)
+- `POST /api/GetPlan`
+   - **Request**: `{ "UserID": string }`
+   - **Response**: Personalized meal plan based on real user profile and local restaurant data, generated by LLM. Example:
+      ```json
+      {
+         "morn": { "Name": "...", "Restaurant": "...", "Calorie": 0, ... },
+         "afternoon": { /* APIMeal */ },
+         "dinner": { /* APIMeal */ },
+         "Alt": [ /* APIMeal[] */ ],
+         "expected_calories": 1800
+      }
+      ```
+
+---
+
+
+---
+
+## 🛠️ Development & Testing
+
+- **Hot reload**: `npm run dev` (uses nodemon)
+- **Real DB Testing**: All user and meal operations use MongoDB. Use a test database for development.
+- **LLM Integration**: Test meal plan generation with real user data and OpenRouter API (requires API key in `.env`).
+- **Test scripts**: See `tests/` for data import, migration, and validation utilities.
+
+---
+
+
+---
+
+## 🔒 Security & Validation
+
+- **CORS**: Configurable via `.env` (default: permissive for demo, restrict for production)
+- **Input Validation**: All endpoints use `zod` for runtime validation. Invalid input returns 400 with error details.
+- **Authentication**: JWT-based, with secure password hashing and account status checks. Profile completeness and virtual fields (BMI, completion %) are enforced.
+
+---
+
+
+---
+
+## 🧩 Architecture Overview
+
+- **Express App**: Bootstrapped in `src/index.js`
+- **MongoDB Models**: `src/models/User.js` and `src/models/MealDatabase.js` define all persistent data
+- **Controllers**: Business logic in `src/controllers/` (auth, meal plan, profile)
+- **Services**: LLM integration and meal plan logic in `src/services/`
+- **Types**: API shapes in `src/types/api.js`
+- **Error Handling**: Centralized in `src/middleware/errorHandler.js`
+
+---
+
+
+---
+
+## 📄 Environment Variables
+
+Create a `.env` file in `backend/` (see `.env.example` for all options):
+
+```env
+NODE_ENV=development
+PORT=3001
+MONGODB_URI=your-mongodb-uri
+JWT_SECRET=your-super-secret-jwt-key
+OPENROUTER_API_KEY=your-openrouter-api-key
+CORS_ORIGIN=http://localhost:19006
+```
+
+---
+
+
+---
+
+## 🔮 Future Enhancements
+
+- [ ] OAuth and social login support
+- [ ] Meal history, analytics, and admin dashboard
+- [ ] Advanced LLM prompt engineering and multi-model support
+- [ ] Push notifications and reminders
+
+---
+
+## 🤝 Contributing
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit changes**: `git commit -m 'Add amazing feature'`
+4. **Push to branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
+
+**Development Guidelines**
+- Write clear, maintainable code
+- Add/Update documentation for significant changes
+- Use environment variables for config
+- Keep all business logic in `services/` and `controllers/`
+
+---
+
+---
+
+**Built for the AWS AI Hackathon — Smart Food Delivery Nutrition Tracking System**
