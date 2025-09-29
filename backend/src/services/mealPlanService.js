@@ -121,11 +121,14 @@ async function generateMealPlan(userId) {
   filteredRestaurants.forEach(r => {
     if (Array.isArray(r.items)) {
       r.items.forEach(item => {
+        // A meal can be in multiple slots if its time overlaps
         if (item.start_time <= 8 && item.end_time >= 11) {
           breakfastMeals.push({ ...item, restaurant: r.name, location: r.location });
-        } else if (item.start_time <= 11 && item.end_time >= 14) {
+        }
+        if (item.start_time <= 11 && item.end_time >= 14) {
           lunchMeals.push({ ...item, restaurant: r.name, location: r.location });
-        } else if (item.start_time <= 18 && item.end_time >= 21) {
+        }
+        if (item.start_time <= 18 && item.end_time >= 21) {
           dinnerMeals.push({ ...item, restaurant: r.name, location: r.location });
         }
       });
