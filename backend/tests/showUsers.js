@@ -1,6 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 const mongoose = require('mongoose');
-const User = require('./src/models/User');
+const User = require('../src/models/User');
 const dbUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/yourDatabaseName';
 
 async function showUsers() {
