@@ -340,7 +340,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <View style={styles.calorieCard}>
             <Text style={styles.calorieTitle}>Daily Calorie Goal</Text>
             {user && (
-            {user && (
               <Text style={styles.calorieSubtitle}>
                 {formatGoalDescription(user.goal)}
                 {formatGoalDescription(user.goal)}
