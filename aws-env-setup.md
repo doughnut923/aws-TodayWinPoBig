@@ -5,6 +5,7 @@ Set in Amplify Console > Environment Variables:
 - `MONGODB_URI`: Your MongoDB connection string
 - `JWT_SECRET`: Random 32+ character string
 - `CORS_ORIGIN`: Your frontend domain
+- `OPENROUTER_API_KEY`: Your OpenRouter API key
 
 ## 2. AWS App Runner
 ```bash
