@@ -5,19 +5,10 @@ applications:
       phases:
         preBuild:
           commands:
-            - cd ../backend && npm install
-            - cd ../frontend && npm install
+            - npm install
         build:
           commands:
-            - echo "Starting backend in background"
-            - cd ../backend && nohup npm start > backend.log 2>&1 &
-            - sleep 5
-            - echo "Building frontend"
             - npm run web:build
-        postBuild:
-          commands:
-            - echo "Stopping backend"
-            - pkill -f "node src/index.js" || true
       artifacts:
         baseDirectory: dist
         files:
@@ -25,4 +16,3 @@ applications:
       cache:
         paths:
           - node_modules/**/*
-          - ../backend/node_modules/**/*
