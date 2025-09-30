@@ -1,27 +1,23 @@
 version: 1
 applications:
-  - appRoot: .
+  - appRoot: frontend
     frontend:
       phases:
         preBuild:
           commands:
-            - echo "Installing Docker Compose"
-            - sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
-            - sudo chmod +x /usr/local/bin/docker-compose
-            - docker --version
-            - docker-compose --version
+            - cd ../backend && npm install
+            - cd ../frontend && npm install
         build:
           commands:
-            - echo "Building with Docker Compose"
-            - docker-compose -f docker-compose.prod.yml build
-            - echo "Starting services"
-            - docker-compose -f docker-compose.prod.yml up -d
-            - echo "Extracting frontend build"
-            - docker cp $(docker-compose -f docker-compose.prod.yml ps -q frontend):/usr/share/nginx/html ./dist
+            - echo "Starting backend in background"
+            - cd ../backend && nohup npm start > backend.log 2>&1 &
+            - sleep 5
+            - echo "Building frontend"
+            - npm run web:build
         postBuild:
           commands:
-            - echo "Cleaning up containers"
-            - docker-compose -f docker-compose.prod.yml down
+            - echo "Stopping backend"
+            - pkill -f "node src/index.js" || true
       artifacts:
         baseDirectory: dist
         files:
@@ -29,3 +25,4 @@ applications:
       cache:
         paths:
           - node_modules/**/*
+          - ../backend/node_modules/**/*
