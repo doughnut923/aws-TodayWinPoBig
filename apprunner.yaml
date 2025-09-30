@@ -5,7 +5,6 @@ build:
     build:
       - cd backend && npm install --production
 run:
-  runtime-version: 22
   command: cd backend && npm start
   network:
     port: 3000
