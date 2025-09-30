@@ -31,20 +31,15 @@ https://github.com/user-attachments/assets/0e5cebf0-b1ec-4ec5-baf0-2cc2ae254139
 
 - Calculates daily calorie targets using BMR (Basal Metabolic Rate) based on user's age, weight, height
 - Supports different health goals: **Weight Loss**, **Muscle Gain**, or **Healthy Eating**
-- Real-time calorie tracking with animated progress bars
+- Calorie tracking with animated progress bars
 
 ### **Smart Meal Planning**
 
 - AI-powered meal recommendations (morning, afternoon, dinner + alternatives)
 - Each meal shows: restaurant, calories, ingredients, price, and nutritional tags
-- Users can check off ordered meals to automatically track calories
+- Users can check off ordered meals to track calories
 
 ## Project Structure 🔰
 
 - [Frontend](frontend/README.md)
 - [Backend](backend/README.md)
-
-## Developer Q Adaptation 🤖
-
-- Facilitate code generation tools to significantly **reduce development time**
-- Generated documentation to ensure code readability
